@@ -1,0 +1,18 @@
+// Undo the default browser styles so they don't get in the way of our future CSS
+// NOTE: These styles are important for accessibility and should be added again 
+// with brand-specific styles
+
+// TODO: Use scss-normalize package to do this for us when you can be bothered
+
+button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+input {
+    border: none;
+}
