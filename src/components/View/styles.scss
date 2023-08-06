@@ -1,4 +1,29 @@
-.container {
-    padding: 15px;
-    border: 1px solid red;
+@import 'styles/internal';
+
+.view {
+    position: relative;
+
+    border: 1px solid $color__black;
+    // transition: width .2s linear;
+
+    // &:hover {
+    //     width: 26%;
+    // }
+
+    &::before {
+        content: "";
+        display: block;
+        padding-bottom: 100%;
+    }
+}
+
+.content {
+    @include rounded("md");
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
