@@ -1,8 +1,9 @@
-@import 'styles/internal';
+@import 'shared/styles';
 
 $control-width: 8rem;
 
 // 1. Size controls (same for horizontal/vertical positions)
+//    Also, place the element on the appropriate x/y axis
 // 2. Location controls (different for each)
 .sizeControl {
     @include rounded('lg');
@@ -15,6 +16,7 @@ $control-width: 8rem;
 
     opacity: 70;
     background-color: $color__black;
+    pointer-events: none;
 
     // [1]
     &.top,
