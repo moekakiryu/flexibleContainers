@@ -18,7 +18,7 @@ function ViewController() {
         setResizeDirection(direction)
     }
 
-    const onMouseMove = ({ clientX, clientY }) => {
+    const resizeActiveView = ({ clientX, clientY }) => {
         if (!dragOrigin) {
             return
         }
@@ -39,13 +39,13 @@ function ViewController() {
         })
     }
 
-    const onMouseUp = () => setDragOrigin(null)
+    const clearDragOrigin = () => setDragOrigin(null)
 
     return (
         <div
             className={styles.controller}
-            onMouseMove={onMouseMove}
-            onMouseUp={onMouseUp}
+            onMouseMove={resizeActiveView}
+            onMouseUp={clearDragOrigin}
         >
                 <View
                     width={elementWidth}
