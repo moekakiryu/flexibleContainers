@@ -56,7 +56,7 @@ class View extends React.Component {
         })
     }
 
-    getControlRegions = (container, mouseX, mouseY, options = { regionSize: 0.15 }) => {
+    getControlRegions = (container, mouseX, mouseY, options = { regionSize: 0.1 }) => {
         const {
             offsetTop: containerTop,
             offsetLeft: containerLeft,
