@@ -10,7 +10,7 @@ export const POSITION = {
   right: 'right',
 }
 
-function SizeControl({ isVisible, position }) {
+function SizeControl({ position }) {
   // Note: Below we could create a mapping from POSITION values to their
   //       matching styles. While that would be more concise, this has the
   //       benefit of being readable at a glance (unlike this comment)
@@ -30,7 +30,7 @@ function SizeControl({ isVisible, position }) {
 
   return (
     <React.Fragment>
-      {isVisible && sizeControl}
+      {!!position && sizeControl}
     </React.Fragment>
   )
 }
