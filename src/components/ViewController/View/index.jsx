@@ -9,7 +9,6 @@ import styles from './styles.scss'
 class View extends React.Component {
     state = {
         activeControl: null,
-        dragOrigin: null
     }
 
     constructor(props) {
@@ -19,30 +18,10 @@ class View extends React.Component {
     }
 
     onMouseMove = ({ clientX, clientY }) => {
-        console.log('-- Move --')
-        const { requestResize, width, height } = this.props
-        const { activeControl, dragOrigin } = this.state
-
-        const isHorizontal = activeControl === POSITION.left || activeControl === POSITION.right
-        const isVertical = activeControl === POSITION.top || activeControl === POSITION.bottom
+        // console.log('-- Move --')
 
         const controlRegions = this.getControlRegions(this.containerRef.current, clientX, clientY)
-        const newActiveControl = this.filterControlRegions(controlRegions) || null
-
-        if (activeControl && dragOrigin) {
-            console.log('Drag')
-            requestResize({
-                id: '<view uuid>',
-                width: isHorizontal && width + (clientX - dragOrigin.x), // new width
-                height: isVertical && height + (clientY - dragOrigin.y), // new width
-            })
-            this.setState({
-                dragOrigin: {
-                    x: clientX,
-                    y: clientY,
-                }
-            })
-        }
+        const activeControl = this.filterControlRegions(controlRegions) || null
 
         // IMPORTANT: Page components can NOT be children of this component or else they will ALWAYS re-render on mouse move
         // NOTE: (to self) this isn't ideal for performance both because we're updating these
@@ -50,37 +29,28 @@ class View extends React.Component {
         //                 this components state, AND the parent component which in turn 
         //                 updates this component's props, forcing a double render for every
         //                 single mouse move event
-        this.setState({ activeControl: newActiveControl })
+        this.setState({ activeControl })
     }
 
     onMouseDown = ({ clientX, clientY }) => {
-        // TODO: Call helper function from parent to capture which element has been clicked, then move all mouseMove logic into parent. eg:
-        // const { onClick } = this.props
-        // onClick({
-        //     id: '<view uuid>',
-        //     direction: activeControl,
-        //     clientX, - maybe
-        //     clientY, - maybe
-        // })
+        const { requestResize } = this.props
+        const { activeControl } = this.state
 
-        this.setState({
-            dragOrigin: {
-                x: clientX,
-                y: clientY
-            },
-        })
-    }
-
-    onMouseUp = () => {
-        this.setState({
-            dragOrigin: null,
-        })
+        if (activeControl) {
+            requestResize({
+                id: '<view uuid>',
+                direction: activeControl,
+                origin: {
+                    x: clientX,
+                    y: clientY,
+                }
+            })
+        }
     }
 
     onMouseLeave = () => {
         this.setState({
             activeControl: null,
-            dragOrigin: null,
         })
     }
 
