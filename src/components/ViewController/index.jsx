@@ -46,6 +46,7 @@ function ViewController() {
             className={styles.controller}
             onMouseMove={resizeActiveView}
             onMouseUp={clearDragOrigin}
+            onMouseLeave={clearDragOrigin}
         >
                 <View
                     width={elementWidth}
