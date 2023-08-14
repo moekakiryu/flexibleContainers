@@ -1,0 +1,23 @@
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+}
+
+
+// 1. Set `html` element's font size to 10px to make rem easier to use
+//    See: https://www.aleksandrhovhannisyan.com/blog/62-5-percent-font-size-trick/
+html {
+    box-sizing: border-box;
+    font-size: 62.5%; // [1]
+}
+
+// 1. Reset the body font size to 16px so the text isn't tiny
+body {
+    font-size: 1.6rem; // [1]
+}
+
+html, body, #root {
+    margin: 0;
+    min-height: 100%;
+}
