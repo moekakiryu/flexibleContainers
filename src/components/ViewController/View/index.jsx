@@ -87,8 +87,7 @@ class View extends React.Component {
     }
 
     render() {
-        console.log('Render')
-        const { width, height, ...otherProps } = this.props
+        const { width, height, requestResize, ...otherProps } = this.props
         const { activeControl } = this.state
 
         return (
