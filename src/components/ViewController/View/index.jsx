@@ -18,10 +18,10 @@ class View extends React.Component {
     }
 
     onMouseMove = ({ clientX, clientY }) => {
-        // console.log('-- Move --')
+        const { activeControl } = this.state
 
         const controlRegions = this.getControlRegions(this.containerRef.current, clientX, clientY)
-        const activeControl = this.filterControlRegions(controlRegions) || null
+        const newActiveControl = this.filterControlRegions(controlRegions) || null
 
         // IMPORTANT: Page components can NOT be children of this component or else they will ALWAYS re-render on mouse move
         // NOTE: (to self) this isn't ideal for performance both because we're updating these
@@ -29,7 +29,9 @@ class View extends React.Component {
         //                 this components state, AND the parent component which in turn 
         //                 updates this component's props, forcing a double render for every
         //                 single mouse move event
-        this.setState({ activeControl })
+        if (activeControl !== newActiveControl) {
+            this.setState({ activeControl: newActiveControl })
+        }
     }
 
     onMouseDown = ({ clientX, clientY }) => {
