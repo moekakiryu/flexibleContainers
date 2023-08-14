@@ -48,9 +48,10 @@ function ViewController() {
             onMouseUp={onMouseUp}
         >
                 <View
-                    requestResize={requestResize}
                     width={elementWidth}
                     height={elementHeight}
+                    isDragged={!!dragOrigin}
+                    requestResize={requestResize}
                 />
         </div>
     )

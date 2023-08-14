@@ -18,6 +18,7 @@ class View extends React.Component {
     }
 
     onMouseMove = ({ clientX, clientY }) => {
+        const { isDragged } = this.props
         const { activeControl } = this.state
 
         const controlRegions = this.getControlRegions(this.containerRef.current, clientX, clientY)
@@ -29,7 +30,7 @@ class View extends React.Component {
         //                 this components state, AND the parent component which in turn 
         //                 updates this component's props, forcing a double render for every
         //                 single mouse move event
-        if (activeControl !== newActiveControl) {
+        if (!isDragged && activeControl !== newActiveControl) {
             this.setState({ activeControl: newActiveControl })
         }
     }
@@ -51,9 +52,13 @@ class View extends React.Component {
     }
 
     onMouseLeave = () => {
-        this.setState({
-            activeControl: null,
-        })
+        const { isDragged } = this.props
+
+        if (!isDragged) {
+            this.setState({
+                activeControl: null,
+            })
+        }
     }
 
     getControlRegions = (container, mouseX, mouseY, options = { regionSize: 0.1 }) => {
@@ -87,7 +92,13 @@ class View extends React.Component {
     }
 
     render() {
-        const { width, height, requestResize, ...otherProps } = this.props
+        const {
+            width,
+            height,
+            isDragged,
+            requestResize,
+            ...otherProps
+        } = this.props
         const { activeControl } = this.state
 
         return (
