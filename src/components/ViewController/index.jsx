@@ -106,6 +106,10 @@ function ViewController() {
           <View
             width={view.width}
             height={view.height}
+            neighbors={{
+              [POSITION.left]: prevView,
+              [POSITION.right]: nextView,
+            }}
             isDragged={!!activeViewId}
             requestResize={requestResize}
             viewId={view.id}

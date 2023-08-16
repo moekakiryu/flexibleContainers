@@ -9,6 +9,7 @@ import styles from './styles.scss'
 function View({
   width,
   height,
+  neighbors,
   isDragged,
   requestResize,
   viewId,
@@ -34,8 +35,16 @@ function View({
     return activeRegions
   }
 
+  /**
+   * Get the property name of a true value in a JS object. If multiple values
+   * are true, only one will be returned. Which one is chosen is left to the
+   * JS implementation.
+   *
+   * @param {*} regions A key/value boolean mapping
+   * @returns The name of a true property or undefined
+   */
   const filterControlRegions = regions => {
-    const activeRegions = _pickBy(regions, (isActive, position) => isActive)
+    const activeRegions = _pickBy(regions, (isActive, region) => isActive && !!neighbors[region])
 
     return _keys(activeRegions)[0]
   }
