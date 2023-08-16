@@ -16,25 +16,18 @@ function View({
   const containerRef = useRef()
   const [ activeControl, setActiveControl ] = useState(null)
 
-  const getControlRegions = (container, mouseX, mouseY, options = { regionSize: 0.1 }) => {
-    const {
-      offsetTop: containerTop,
-      offsetLeft: containerLeft,
-      offsetWidth: containerWidth,
-      offsetHeight: containerHeight
-    } = container
-
-    const offsetX = mouseX - containerLeft;
-    const offsetY = mouseY - containerTop;
-
-    const regionWidth = containerWidth * options.regionSize;
-    const regionHeight = containerHeight * options.regionSize;
+  // TODO: This should not be percentage based (small view = tiny region size)
+  const getControlRegions = (container, mouseX, mouseY, options = { regionSize: 0.05 }) => {
+    const mouseOffset = {
+      x: (mouseX - container.offsetLeft) / container.offsetWidth,
+      y: (mouseY - container.offsetTop) / container.offsetHeight,
+    }
 
     const activeRegions = {
-      [POSITION.left]:   offsetX < regionWidth,
-      [POSITION.top]:    offsetY < regionHeight,
-      [POSITION.bottom]: (containerHeight - offsetY) < regionHeight,
-      [POSITION.right]:  (containerWidth - offsetX) < regionWidth,
+      [POSITION.left]:   mouseOffset.x < options.regionSize,
+      [POSITION.top]:    mouseOffset.y < options.regionSize,
+      [POSITION.right]:  1 - mouseOffset.x < options.regionSize,
+      [POSITION.bottom]: 1 - mouseOffset.y < options.regionSize,
     }
 
     return activeRegions
