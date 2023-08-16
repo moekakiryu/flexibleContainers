@@ -79,6 +79,7 @@ function View({
         width: `${width * 100}%`,
         minHeight: `${height * 100}%`,
       }}
+      draggable={false}
       onMouseMove={onMouseMove}
       onMouseDown={onMouseDown}
       onMouseLeave={onMouseLeave}
