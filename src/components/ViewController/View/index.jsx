@@ -11,6 +11,7 @@ function View({
   height,
   isDragged,
   requestResize,
+  viewId,
   ...otherProps
 }) {
   const containerRef = useRef()
@@ -53,7 +54,7 @@ function View({
   const onMouseDown = ({ clientX, clientY }) => {
     if (activeControl) {
       requestResize({
-        id: '<view uuid>',
+        id: viewId,
         direction: activeControl,
         origin: {
           x: clientX,
