@@ -75,7 +75,10 @@ function View({
     <div
       ref={containerRef}
       className={styles.view}
-      style={{ width, height }}
+      style={{
+        width: `${width * 100}%`,
+        minHeight: `${height * 100}%`,
+      }}
       onMouseMove={onMouseMove}
       onMouseDown={onMouseDown}
       onMouseLeave={onMouseLeave}
