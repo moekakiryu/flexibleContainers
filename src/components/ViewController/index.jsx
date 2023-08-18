@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState } from "react"
+import cx from "classnames"
 import _find from 'lodash/find'
 
 import View from './View'
@@ -10,21 +11,21 @@ const defaultViews = [
   {
     id: 'v1',
     width: (1/3),
-    height: 1,
+    height: (1/3),
   },
   {
     id: 'v2',
     width: (1/3),
-    height: 1,
+    height: (1/3),
   },
   {
     id: 'v3',
     width: (1/3),
-    height: 1,
+    height: (1/3),
   }
 ]
 
-function ViewController() {
+function ViewController({ isVertical = false }) {
   const [ views, setViews ] = useState(defaultViews)
 
   const [ dragOrigin, setDragOrigin ] = useState(null)
@@ -44,12 +45,12 @@ function ViewController() {
     // TODO: Fix bug where sum of all widths > screen width (currently left to browser implementation, but it should prevent resize)
     const sizeDelta = {
       x: (clientX - dragOrigin.x) / window.innerWidth,
-      y: clientY - dragOrigin.y,
+      y: (clientY - dragOrigin.y) / window.innerHeight,
     }
 
     const activeView = _find(views, { id: activeViewId })
-    const nextView = views[views.indexOf(activeView) + 1]
     const prevView = views[views.indexOf(activeView) - 1]
+    const nextView = views[views.indexOf(activeView) + 1]
 
     // TODO: split out U/D/L/R
     switch (resizeDirection) {
@@ -68,11 +69,17 @@ function ViewController() {
         break
 
       case POSITION.top:
-        // TODO
+        if (prevView) {
+          activeView.height -= sizeDelta.y
+          prevView.height += sizeDelta.y
+        }
         break
 
       case POSITION.bottom:
-        // TODO
+        if (nextView) {
+          activeView.height += sizeDelta.y
+          nextView.height -= sizeDelta.y
+        }
         break
 
       default:
@@ -93,7 +100,12 @@ function ViewController() {
 
   return (
     <div
-      className={styles.controller}
+      className={cx(
+        styles.controller,
+        {
+          [styles.vertical]: isVertical
+        }
+      )}
       onMouseMove={resizeActiveView}
       onMouseUp={clearDragAction}
       onMouseLeave={clearDragAction}
@@ -102,14 +114,19 @@ function ViewController() {
         const nextView = views[colIdx + 1]
         const prevView = views[colIdx - 1]
 
+        const neighbors = isVertical ? {
+          [POSITION.top]: prevView,
+          [POSITION.bottom]: nextView,
+        } : {
+          [POSITION.left]: prevView,
+          [POSITION.right]: nextView,
+        }
+
         return (
           <View
             width={view.width}
             height={view.height}
-            neighbors={{
-              [POSITION.left]: prevView,
-              [POSITION.right]: nextView,
-            }}
+            neighbors={neighbors}
             isDragged={!!activeViewId}
             requestResize={requestResize}
             viewId={view.id}

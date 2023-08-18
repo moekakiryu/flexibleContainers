@@ -13,4 +13,9 @@
     align-items: stretch;
     justify-content: stretch;
     z-index: -1;
+
+    &.vertical {
+        height: 100%;
+        flex-direction: column;
+    }
 }
