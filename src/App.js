@@ -13,14 +13,19 @@ const defaultLayout = {
       height: 1,
       children: [
         {
-          id: 'c1r1',
+          id: 'c2r1',
           width: 1,
-          height: ( 2 / 3 ),
+          height: ( 1 / 4 ),
         },
         {
-          id: 'c1r2',
+          id: 'c2r2',
           width: 1,
-          height: ( 1 / 3)
+          height: ( 1 / 2 )
+        },
+        {
+          id: 'c2r3',
+          width: 1,
+          height: ( 1 / 4 )
         }
       ]
     },
