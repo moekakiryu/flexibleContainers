@@ -1,6 +1,6 @@
 import ViewController from "components/ViewController";
 
-const viewTree = {
+const defaultLayout = {
   children: [
     {
       id: 'c1',
@@ -60,7 +60,7 @@ function App() {
   return (
     <ViewController
       id="root"
-      layout={viewTree}
+      layout={defaultLayout}
     />
   );
 }
