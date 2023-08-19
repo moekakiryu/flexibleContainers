@@ -152,31 +152,7 @@ function ViewController({
       onMouseUp={onMouseUp}
       onMouseLeave={onMouseLeave}
     >
-      {/*views.map((view, colIdx) => {
-        const nextView = views[colIdx + 1]
-        const prevView = views[colIdx - 1]
-
-        const neighbors = isVertical ? {
-          [POSITION.top]: prevView,
-          [POSITION.bottom]: nextView,
-        } : {
-          [POSITION.left]: prevView,
-          [POSITION.right]: nextView,
-        }
-
-        return (
-          <View
-            width={view.width}
-            height={view.height}
-            neighbors={neighbors}
-            isDragged={!!activeViewId}
-            requestResize={requestResize}
-            viewId={view.id}
-            key={view.id}
-          />
-        )
-      })*/
-      getViewContent()}
+      { getViewContent() }
     </div>
   )
 }
