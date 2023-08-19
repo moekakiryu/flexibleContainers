@@ -38,7 +38,12 @@ function ViewController({
     setActiveViewId(id)
   }
 
-  const resizeActiveView = ({ clientX, clientY }) => {
+  const clearDragAction = () => {
+    setActiveViewId(null)
+    setDragOrigin(null)
+  }
+
+  const onMouseMove = ({ clientX, clientY }) => {
     if (!dragOrigin || !activeViewId) {
       return
     }
@@ -93,10 +98,8 @@ function ViewController({
     })
   }
 
-  const clearDragAction = () => {
-    setActiveViewId(null)
-    setDragOrigin(null)
-  }
+  const onMouseUp = () => clearDragAction()
+  const onMouseLeave = () => clearDragAction()
 
   const getViewContent = () => {
     const { children } = layout
@@ -145,9 +148,9 @@ function ViewController({
           [styles.vertical]: isVertical
         }
       )}
-      onMouseMove={resizeActiveView}
-      onMouseUp={clearDragAction}
-      onMouseLeave={clearDragAction}
+      onMouseMove={onMouseMove}
+      onMouseUp={onMouseUp}
+      onMouseLeave={onMouseLeave}
     >
       {/*views.map((view, colIdx) => {
         const nextView = views[colIdx + 1]
