@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import cx from "classnames"
 import _find from 'lodash/find'
 
@@ -7,30 +7,30 @@ import { POSITION } from "./SizeControl";
 
 import styles from './styles.scss'
 
-const defaultViews = [
-  {
-    id: 'v1',
-    width: (1/3),
-    height: (1/3),
-  },
-  {
-    id: 'v2',
-    width: (1/3),
-    height: (1/3),
-  },
-  {
-    id: 'v3',
-    width: (1/3),
-    height: (1/3),
-  }
-]
 
-function ViewController({ isVertical = false }) {
-  const [ views, setViews ] = useState(defaultViews)
+function ViewController({
+  layout,
+  isVertical = false,
+  id,
+}) {
+  const [ views, setViews ] = useState()
 
   const [ dragOrigin, setDragOrigin ] = useState(null)
   const [ activeViewId, setActiveViewId ] = useState(null)
   const [ resizeDirection, setResizeDirection ] = useState(null)
+
+  useEffect(() => {
+    const { children } = layout
+
+    setViews(children.map(child => (
+      {
+        id: child.id,
+        width: child.width,
+        height: child.height,
+        children: child.children
+      }
+    )))
+  }, [layout])
 
   const requestResize = ({ id, direction, origin }) => {
     setDragOrigin(origin)
@@ -98,6 +98,45 @@ function ViewController({ isVertical = false }) {
     setDragOrigin(null)
   }
 
+  const getViewContent = () => {
+    const { children } = layout
+
+    let components = views?.map((child, childIdx) => {
+      const prevChild = children[childIdx - 1]
+      const nextChild = children[childIdx + 1]
+
+      const neighbors = isVertical ? {
+        [POSITION.top]: prevChild,
+        [POSITION.bottom]: nextChild,
+      } : {
+        [POSITION.left]: prevChild,
+        [POSITION.right]: nextChild,
+      }
+
+      return (
+        <View
+          key={child.id}
+          viewId={child.id}
+          width={child.width}
+          height={child.height}
+          neighbors={neighbors}
+          isDragged={!!activeViewId}
+          requestResize={requestResize}
+          component={child.children?.length > 0 ? (
+            <ViewController
+              key={child.id}
+              layout={child}
+              isVertical={!isVertical}
+              id={child.id}
+            />
+          ) : null}
+        />
+      )
+    })
+
+    return components
+  }
+
   return (
     <div
       className={cx(
@@ -110,7 +149,7 @@ function ViewController({ isVertical = false }) {
       onMouseUp={clearDragAction}
       onMouseLeave={clearDragAction}
     >
-      {views.map((view, colIdx) => {
+      {/*views.map((view, colIdx) => {
         const nextView = views[colIdx + 1]
         const prevView = views[colIdx - 1]
 
@@ -133,7 +172,8 @@ function ViewController({ isVertical = false }) {
             key={view.id}
           />
         )
-      })}
+      })*/
+      getViewContent()}
     </div>
   )
 }

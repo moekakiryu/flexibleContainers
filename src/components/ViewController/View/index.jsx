@@ -13,6 +13,7 @@ function View({
   isDragged,
   requestResize,
   viewId,
+  component,
   ...otherProps
 }) {
   const containerRef = useRef()
@@ -95,7 +96,7 @@ function View({
       {...otherProps}
     >
       <SizeControl position={activeControl} />
-      <div className={styles.content} />
+      <div className={styles.content}>{component}</div>
     </div>
   )
 }
