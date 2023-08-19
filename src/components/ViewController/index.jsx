@@ -31,8 +31,13 @@ function ViewController({
     )))
   }, [layout])
 
-  const requestResize = ({ id, direction, origin }) => setDragAction({ id, origin, direction })
-  const stopResize = () => setDragAction(null)
+  const requestResize = ({ id, direction, origin }) => {
+    setDragAction({ id, origin, direction })
+  }
+
+  const stopResize = () => {
+    setDragAction(null)
+  }
 
   const onMouseMove = ({ clientX, clientY }) => {
     if (!dragAction) {
@@ -50,7 +55,6 @@ function ViewController({
     const prevView = views[views.indexOf(activeView) - 1]
     const nextView = views[views.indexOf(activeView) + 1]
 
-    // TODO: split out U/D/L/R
     switch (direction) {
       case POSITION.left:
         if (prevView) {
@@ -94,8 +98,13 @@ function ViewController({
     })
   }
 
-  const onMouseUp = () => stopResize()
-  const onMouseLeave = () => stopResize()
+  const onMouseUp = () => {
+    stopResize()
+  }
+
+  const onMouseLeave = () => {
+    stopResize()
+  }
 
   const renderViewContent = () => {
     // TODO: Use props where possible
@@ -149,13 +158,13 @@ function ViewController({
           [styles.vertical]: isVertical
         }
       )}
-      onMouseMove={onMouseMove}
-      onMouseUp={onMouseUp}
-      onMouseLeave={onMouseLeave}
       style={{
         width: `${width * 100}%`,
         minHeight: `${height * 100}%`,
       }}
+      onMouseMove={onMouseMove}
+      onMouseUp={onMouseUp}
+      onMouseLeave={onMouseLeave}
     >
       {renderViewContent()}
     </div>
