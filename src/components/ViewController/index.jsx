@@ -7,11 +7,12 @@ import { POSITION } from "./SizeControl";
 
 import styles from './styles.scss'
 
-
 function ViewController({
   layout,
   isVertical = false,
   id,
+  width,
+  height,
 }) {
   const [ views, setViews ] = useState()
 
@@ -101,38 +102,43 @@ function ViewController({
   const onMouseUp = () => clearDragAction()
   const onMouseLeave = () => clearDragAction()
 
-  const getViewContent = () => {
+  const renderViewContent = () => {
+    // TODO: Use props where possible
     const { children } = layout
 
-    let components = views?.map((child, childIdx) => {
-      const prevChild = children[childIdx - 1]
-      const nextChild = children[childIdx + 1]
+    let components = views?.map((view, viewIdx) => {
+      const prevView = children[viewIdx - 1]
+      const nextView = children[viewIdx + 1]
+
+      if (view.children?.length > 0) {
+        return (
+          <ViewController
+            key={view.id}
+            layout={view}
+            isVertical={!isVertical}
+            id={view.id}
+            width={view.width}
+          />
+        )
+      }
 
       const neighbors = isVertical ? {
-        [POSITION.top]: prevChild,
-        [POSITION.bottom]: nextChild,
+        [POSITION.top]: prevView,
+        [POSITION.bottom]: nextView,
       } : {
-        [POSITION.left]: prevChild,
-        [POSITION.right]: nextChild,
+        [POSITION.left]: prevView,
+        [POSITION.right]: nextView,
       }
 
       return (
         <View
-          key={child.id}
-          viewId={child.id}
-          width={child.width}
-          height={child.height}
+          key={view.id}
+          viewId={view.id}
+          width={view.width}
+          height={view.height}
           neighbors={neighbors}
           isDragged={!!activeViewId}
           requestResize={requestResize}
-          component={child.children?.length > 0 ? (
-            <ViewController
-              key={child.id}
-              layout={child}
-              isVertical={!isVertical}
-              id={child.id}
-            />
-          ) : null}
         />
       )
     })
@@ -151,8 +157,12 @@ function ViewController({
       onMouseMove={onMouseMove}
       onMouseUp={onMouseUp}
       onMouseLeave={onMouseLeave}
+      style={{
+        width: `${width * 100}%`,
+        minHeight: `${height * 100}%`,
+      }}
     >
-      { getViewContent() }
+      {renderViewContent()}
     </div>
   )
 }
