@@ -59,7 +59,7 @@ const defaultLayout = {
 function App() {
   return (
     <ViewController
-      id="root"
+      controllerId="root"
       layout={defaultLayout}
     />
   );

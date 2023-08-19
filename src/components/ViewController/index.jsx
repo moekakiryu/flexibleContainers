@@ -10,7 +10,7 @@ import styles from './styles.scss'
 function ViewController({
   layout,
   isVertical = false,
-  id,
+  controllerId,
   width,
   height,
 }) {
@@ -116,7 +116,7 @@ function ViewController({
             key={view.id}
             layout={view}
             isVertical={!isVertical}
-            id={view.id}
+            controllerId={view.id}
             width={view.width}
           />
         )
