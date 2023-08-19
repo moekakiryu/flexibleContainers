@@ -15,10 +15,7 @@ function ViewController({
   height,
 }) {
   const [ views, setViews ] = useState()
-
-  const [ dragOrigin, setDragOrigin ] = useState(null)
-  const [ activeViewId, setActiveViewId ] = useState(null)
-  const [ resizeDirection, setResizeDirection ] = useState(null)
+  const [ dragAction, setDragAction ] = useState(null)
 
   useEffect(() => {
     const { children } = layout
@@ -28,38 +25,33 @@ function ViewController({
         id: child.id,
         width: child.width,
         height: child.height,
+        // TODO: Children shouldn't be here
         children: child.children
       }
     )))
   }, [layout])
 
-  const requestResize = ({ id, direction, origin }) => {
-    setDragOrigin(origin)
-    setResizeDirection(direction)
-    setActiveViewId(id)
-  }
-
-  const clearDragAction = () => {
-    setActiveViewId(null)
-    setDragOrigin(null)
-  }
+  const requestResize = ({ id, direction, origin }) => setDragAction({ id, origin, direction })
+  const stopResize = () => setDragAction(null)
 
   const onMouseMove = ({ clientX, clientY }) => {
-    if (!dragOrigin || !activeViewId) {
+    if (!dragAction) {
       return
     }
+    const { id, origin, direction } = dragAction
+
     // TODO: Fix bug where sum of all widths > screen width (currently left to browser implementation, but it should prevent resize)
     const sizeDelta = {
-      x: (clientX - dragOrigin.x) / window.innerWidth,
-      y: (clientY - dragOrigin.y) / window.innerHeight,
+      x: (clientX - origin.x) / window.innerWidth,
+      y: (clientY - origin.y) / window.innerHeight,
     }
 
-    const activeView = _find(views, { id: activeViewId })
+    const activeView = _find(views, { id })
     const prevView = views[views.indexOf(activeView) - 1]
     const nextView = views[views.indexOf(activeView) + 1]
 
     // TODO: split out U/D/L/R
-    switch (resizeDirection) {
+    switch (direction) {
       case POSITION.left:
         if (prevView) {
           activeView.width -= sizeDelta.x
@@ -89,18 +81,21 @@ function ViewController({
         break
 
       default:
-        console.error(`Can't resize in unknown direction: '${resizeDirection}'`)
+        console.error(`Can't resize in unknown direction: '${direction}'`)
     }
-    setViews([...views])
 
-    setDragOrigin({
-      x: clientX,
-      y: clientY,
+    setViews([...views])
+    setDragAction({
+      ...dragAction,
+      origin: {
+        x: clientX,
+        y: clientY
+      }
     })
   }
 
-  const onMouseUp = () => clearDragAction()
-  const onMouseLeave = () => clearDragAction()
+  const onMouseUp = () => stopResize()
+  const onMouseLeave = () => stopResize()
 
   const renderViewContent = () => {
     // TODO: Use props where possible
@@ -137,7 +132,7 @@ function ViewController({
           width={view.width}
           height={view.height}
           neighbors={neighbors}
-          isDragged={!!activeViewId}
+          isDragged={!!dragAction}
           requestResize={requestResize}
         />
       )
