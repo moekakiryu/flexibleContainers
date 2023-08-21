@@ -27,13 +27,15 @@ function ViewController({
   useEffect(() => {
     const { children } = layout
 
+    const totalWidth = children.reduce((total, child) => total + child.width, 0)
+    const totalHeight = children.reduce((total, child) => total + child.height, 0)
+
+    // Normalize the values in the long axis in case they sum to grater than 100%
     setViews(children.map(child => (
       {
-        id: child.id,
-        width: child.width,
-        height: child.height,
-        // TODO: Children shouldn't be here
-        children: child.children
+        ...child,
+        width: !isVertical ? ( child.width / totalWidth ) : child.width,
+        height: isVertical ? ( child.height / totalHeight ) : child.height,
       }
     )))
   }, [layout])
