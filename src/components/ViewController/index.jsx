@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react"
+import PropTypes from 'prop-types'
 import cx from "classnames"
 import _find from 'lodash/find'
 
@@ -8,24 +9,14 @@ import View from './View'
 
 import styles from './styles.scss'
 
-function ViewController({
-  layout,
-  width,
-  height,
-  neighbors,
-  controllerId,
-  // TODO: Rename this or use `props`
-  superRequestResize,
-  isDragged,
-  isVertical = false,
-}) {
+function ViewController(props) {
   const containerRef = useRef()
 
   const [ views, setViews ] = useState()
   const [ dragAction, setDragAction ] = useState(null)
 
   useEffect(() => {
-    const { children } = layout
+    const { children } = props.layout
 
     const totalWidth = children.reduce((total, child) => total + child.width, 0)
     const totalHeight = children.reduce((total, child) => total + child.height, 0)
@@ -34,11 +25,11 @@ function ViewController({
     setViews(children.map(child => (
       {
         ...child,
-        width: !isVertical ? ( child.width / totalWidth ) : child.width,
-        height: isVertical ? ( child.height / totalHeight ) : child.height,
+        width: !props.isVertical ? ( child.width / totalWidth ) : child.width,
+        height: props.isVertical ? ( child.height / totalHeight ) : child.height,
       }
     )))
-  }, [layout])
+  }, [props.layout])
 
   const requestResize = ({ id, direction, origin }) => {
     const isResizeVertical = (direction === POSITION.top || direction === POSITION.bottom)
@@ -46,11 +37,11 @@ function ViewController({
     const isFirstChild = views?.[0].id === id
     const isLastChild = views?.[views.length - 1].id === id
 
-    const isBeyondHorizontalBounds = !isVertical && (
+    const isBeyondHorizontalBounds = !props.isVertical && (
       (isFirstChild && direction === POSITION.left) ||
       (isLastChild && direction === POSITION.right)
     )
-    const isBeyondVerticalBounds = isVertical && (
+    const isBeyondVerticalBounds = props.isVertical && (
       (isFirstChild && direction === POSITION.up) ||
       (isLastChild && direction === POSITION.down)
     )
@@ -59,13 +50,13 @@ function ViewController({
     // the flex direction. If the resize request is for the short axis, then
     // forward the request to the parent container so that the pattern is
     // maintained.
-    if (isVertical !== isResizeVertical) {
-      superRequestResize({ id: controllerId, direction, origin})
+    if (props.isVertical !== isResizeVertical) {
+      props.requestResize({ id: props.controllerId, direction, origin})
     // If we are trying to resize in a direction that isn't possible
     // (eg left for the first child), pass thre resize request to the parent to
     // handle.
     } else if (isBeyondHorizontalBounds || isBeyondVerticalBounds) {
-      superRequestResize({ id: controllerId, direction, origin })
+      props.requestResize({ id: props.controllerId, direction, origin })
     // Otherwise handle the request normally
     } else {
       setDragAction({ id, origin, direction })
@@ -145,20 +136,19 @@ function ViewController({
 
   const renderChildren = () => {
     // TODO: Use props where possible
-    const { children } = layout
+    const { children } = props.layout
 
     let components = views?.map((view, viewIdx) => {
       const prevView = children[viewIdx - 1]
       const nextView = children[viewIdx + 1]
 
-      // TODO: rename this too after changing to props
       // TODO: If next/prev view are undefined, inherit from props instead
-      const childNeighbors = isVertical ? {
-        ...neighbors,
+      const neighbors = props.isVertical ? {
+        ...props.neighbors,
         [POSITION.top]: prevView,
         [POSITION.bottom]: nextView,
       } : {
-        ...neighbors,
+        ...props.neighbors,
         [POSITION.left]: prevView,
         [POSITION.right]: nextView,
       }
@@ -171,10 +161,10 @@ function ViewController({
             width={view.width}
             height={view.height}
             controllerId={view.id}
-            neighbors={childNeighbors}
-            superRequestResize={requestResize}
-            isDragged={!!dragAction || isDragged}
-            isVertical={!isVertical}
+            neighbors={neighbors}
+            requestResize={requestResize}
+            isDragged={!!dragAction || props.isDragged}
+            isVertical={!props.isVertical}
           />
         )
       }
@@ -185,8 +175,8 @@ function ViewController({
           width={view.width}
           height={view.height}
           viewId={view.id}
-          neighbors={childNeighbors}
-          isDragged={!!dragAction || isDragged}
+          neighbors={neighbors}
+          isDragged={!!dragAction || props.isDragged}
           requestResize={requestResize}
         />
       )
@@ -201,12 +191,12 @@ function ViewController({
       className={cx(
         styles.controller,
         {
-          [styles.vertical]: isVertical
+          [styles.vertical]: props.isVertical
         }
       )}
       style={{
-        width: decimalToPercent(width),
-        height: decimalToPercent(height),
+        width: decimalToPercent(props.width),
+        height: decimalToPercent(props.height),
       }}
       onMouseMove={onMouseMove}
       onMouseUp={onMouseUp}
@@ -215,6 +205,21 @@ function ViewController({
       {renderChildren()}
     </div>
   )
+}
+
+ViewController.propTypes = {
+  layout: PropTypes.shape({}).isRequired,
+  width: PropTypes.number.isRequired,
+  height: PropTypes.number.isRequired,
+  controllerId: PropTypes.string.isRequired,
+  requestResize: PropTypes.func.isRequired,
+  neighbors: PropTypes.shape({}),
+  isDragged: PropTypes.bool,
+  isVertical: PropTypes.bool,
+}
+
+ViewController.defaultProps = {
+  isVertical: false,
 }
 
 export default ViewController
