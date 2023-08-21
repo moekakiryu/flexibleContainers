@@ -16,6 +16,7 @@ function ViewController({
   controllerId,
   // TODO: Rename this or use `props`
   superRequestResize,
+  isDragged,
   isVertical = false,
 }) {
   const containerRef = useRef()
@@ -153,6 +154,7 @@ function ViewController({
             controllerId={view.id}
             neighbors={childNeighbors}
             superRequestResize={requestResize}
+            isDragged={!!dragAction || isDragged}
             isVertical={!isVertical}
           />
         )
@@ -163,9 +165,9 @@ function ViewController({
           key={view.id}
           width={view.width}
           height={view.height}
-          isDragged={!!dragAction}
           viewId={view.id}
           neighbors={childNeighbors}
+          isDragged={!!dragAction || isDragged}
           requestResize={requestResize}
         />
       )
