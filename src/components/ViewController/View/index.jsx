@@ -1,7 +1,5 @@
 import React, { useState, useRef } from 'react'
 // import PropTypes from 'prop-types'
-import _pickBy from 'lodash/pickBy'
-import _keys from 'lodash/keys'
 
 import { decimalToPercent } from 'shared/utils/units'
 import SizeControl, { POSITION } from "../SizeControl"
@@ -40,21 +38,24 @@ function View({
 
   /**
    * Get the property name of a true value in a JS object. If multiple values
-   * are true, only one will be returned. Which one is chosen is left to the
+   * are true, only the first will be returned. Which one is first is up to the
    * JS implementation.
    *
    * @param {*} regions A key/value boolean mapping
    * @returns The name of a true property or undefined
    */
   const filterControlRegions = regions => {
-    const activeRegions = _pickBy(regions, (isActive, region) => isActive && !!neighbors[region])
-
-    return _keys(activeRegions)[0]
+    for (const [region, isActive] of Object.entries(regions)) {
+      if (isActive && !!neighbors[region]) {
+        return region
+      }
+    }
+    return null
   }
 
   const onMouseMove = ({ clientX, clientY }) => {
     const controlRegions = getControlRegions(containerRef.current, clientX, clientY)
-    const newActiveControl = filterControlRegions(controlRegions) || null
+    const newActiveControl = filterControlRegions(controlRegions)
 
     // IMPORTANT: Page components can NOT be children of this component or else they will ALWAYS re-render on mouse move
     //            Use an alternate method to render them or use shouldComponentUpdate
