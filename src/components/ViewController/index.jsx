@@ -145,12 +145,12 @@ function ViewController(props) {
       // TODO: If next/prev view are undefined, inherit from props instead
       const neighbors = props.isVertical ? {
         ...props.neighbors,
-        [POSITION.top]: prevView,
-        [POSITION.bottom]: nextView,
+        [POSITION.top]: prevView || props.neighbors[POSITION.top],
+        [POSITION.bottom]: nextView || props.neighbors[POSITION.bottom],
       } : {
         ...props.neighbors,
-        [POSITION.left]: prevView,
-        [POSITION.right]: nextView,
+        [POSITION.left]: prevView || props.neighbors[POSITION.left],
+        [POSITION.right]: nextView || props.neighbors[POSITION.right],
       }
 
       if (view.children?.length > 0) {
@@ -220,6 +220,7 @@ ViewController.propTypes = {
 
 ViewController.defaultProps = {
   isVertical: false,
+  neighbors: {},
 }
 
 export default ViewController
