@@ -43,12 +43,29 @@ function ViewController({
   const requestResize = ({ id, direction, origin }) => {
     const isResizeVertical = (direction === POSITION.top || direction === POSITION.bottom)
 
+    const isFirstChild = views?.[0].id === id
+    const isLastChild = views?.[views.length - 1].id === id
+
+    const isBeyondHorizontalBounds = !isVertical && (
+      (isFirstChild && direction === POSITION.left) ||
+      (isLastChild && direction === POSITION.right)
+    )
+    const isBeyondVerticalBounds = isVertical && (
+      (isFirstChild && direction === POSITION.up) ||
+      (isLastChild && direction === POSITION.down)
+    )
+
     // Resizing should always be done for the long axis so that it aligns with
     // the flex direction. If the resize request is for the short axis, then
     // forward the request to the parent container so that the pattern is
     // maintained.
     if (isVertical !== isResizeVertical) {
       superRequestResize({ id: controllerId, direction, origin})
+    // If we are trying to resize in a direction that isn't possible
+    // (eg left for the first child), pass thre resize request to the parent to
+    // handle.
+    } else if (isBeyondHorizontalBounds || isBeyondVerticalBounds) {
+      superRequestResize({ id: controllerId, direction, origin })
     // Otherwise handle the request normally
     } else {
       setDragAction({ id, origin, direction })
