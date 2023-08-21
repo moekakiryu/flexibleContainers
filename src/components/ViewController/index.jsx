@@ -3,6 +3,7 @@ import cx from "classnames"
 import _find from 'lodash/find'
 
 import View from './View'
+import { decimalToPercent } from "shared/utils/units"
 import { POSITION } from "./SizeControl";
 
 import styles from './styles.scss'
@@ -159,8 +160,8 @@ function ViewController({
         }
       )}
       style={{
-        width: `${width * 100}%`,
-        minHeight: `${height * 100}%`,
+        width: decimalToPercent(width),
+        height: decimalToPercent(height),
       }}
       onMouseMove={onMouseMove}
       onMouseUp={onMouseUp}

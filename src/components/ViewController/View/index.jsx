@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react'
 // import PropTypes from 'prop-types'
 import _pickBy from 'lodash/pickBy'
 import _keys from 'lodash/keys'
+
+import { decimalToPercent } from 'shared/utils/units'
 import SizeControl, { POSITION } from "../SizeControl"
 
 import styles from './styles.scss'
@@ -86,8 +88,8 @@ function View({
       ref={containerRef}
       className={styles.view}
       style={{
-        width: `${width * 100}%`,
-        minHeight: `${height * 100}%`,
+        width: decimalToPercent(width),
+        height: decimalToPercent(height),
       }}
       draggable={false}
       onMouseMove={onMouseMove}
