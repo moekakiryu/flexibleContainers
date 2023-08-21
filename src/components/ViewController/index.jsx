@@ -150,7 +150,7 @@ function ViewController(props) {
     stopResize()
   }
 
-  const renderChildren = () => views?.map(view => {
+  const childViewContent = views?.map(view => {
     if (view.children?.length > 0) {
       return (
         <ViewController
@@ -199,7 +199,7 @@ function ViewController(props) {
       onMouseUp={onMouseUp}
       onMouseLeave={onMouseLeave}
     >
-      {renderChildren()}
+      {childViewContent}
     </div>
   )
 }
