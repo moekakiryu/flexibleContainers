@@ -22,14 +22,33 @@ function ViewController(props) {
     const totalHeight = children.reduce((total, child) => total + child.height, 0)
 
     // Normalize the values in the long axis in case they sum to grater than 100%
-    setViews(children.map(child => (
-      {
+    setViews(children.map((child, childIdx) => {
+      const prevChild = children[childIdx - 1]
+      const nextChild = children[childIdx + 1]
+
+      const childNeighbors = props.isVertical ? {
+        ...props.neighbors,
+        [POSITION.top]: prevChild || props.neighbors[POSITION.top],
+        [POSITION.bottom]: nextChild || props.neighbors[POSITION.bottom],
+      } : {
+        ...props.neighbors,
+        [POSITION.left]: prevChild || props.neighbors[POSITION.left],
+        [POSITION.right]: nextChild || props.neighbors[POSITION.right],
+      }
+
+      return {
         ...child,
         width: !props.isVertical ? ( child.width / totalWidth ) : child.width,
         height: props.isVertical ? ( child.height / totalHeight ) : child.height,
+        neighbors: childNeighbors,
       }
-    )))
-  }, [props.layout])
+    }))
+  // Note that none of these props are expected to change frequently
+  }, [
+    props.layout,
+    props.neighbors,
+    props.isVertical
+  ])
 
   const requestResize = ({ id, direction, origin }) => {
     const isResizeVertical = (direction === POSITION.top || direction === POSITION.bottom)
@@ -134,56 +153,37 @@ function ViewController(props) {
     stopResize()
   }
 
-  const renderChildren = () => {
-    // TODO: Use props where possible
-    const { children } = props.layout
-
-    let components = views?.map((view, viewIdx) => {
-      const prevView = children[viewIdx - 1]
-      const nextView = children[viewIdx + 1]
-
-      // TODO: If next/prev view are undefined, inherit from props instead
-      const neighbors = props.isVertical ? {
-        ...props.neighbors,
-        [POSITION.top]: prevView || props.neighbors[POSITION.top],
-        [POSITION.bottom]: nextView || props.neighbors[POSITION.bottom],
-      } : {
-        ...props.neighbors,
-        [POSITION.left]: prevView || props.neighbors[POSITION.left],
-        [POSITION.right]: nextView || props.neighbors[POSITION.right],
-      }
-
-      if (view.children?.length > 0) {
-        return (
-          <ViewController
-            key={view.id}
-            layout={view}
-            width={view.width}
-            height={view.height}
-            controllerId={view.id}
-            neighbors={neighbors}
-            requestResize={requestResize}
-            isDragged={!!dragAction || props.isDragged}
-            isVertical={!props.isVertical}
-          />
-        )
-      }
-
+  const renderChildren = () => views?.map(view => {
+    if (view.children?.length > 0) {
       return (
-        <View
+        <ViewController
           key={view.id}
+          layout={view}
           width={view.width}
           height={view.height}
-          viewId={view.id}
-          neighbors={neighbors}
-          isDragged={!!dragAction || props.isDragged}
+
+          controllerId={view.id}
+          neighbors={view.neighbors}
           requestResize={requestResize}
+          isDragged={!!dragAction || props.isDragged}
+          isVertical={!props.isVertical}
         />
       )
-    })
+    }
 
-    return components
-  }
+    return (
+      <View
+        key={view.id}
+        width={view.width}
+        height={view.height}
+
+        viewId={view.id}
+        neighbors={view.neighbors}
+        isDragged={!!dragAction || props.isDragged}
+        requestResize={requestResize}
+      />
+    )
+  })
 
   return (
     <div
