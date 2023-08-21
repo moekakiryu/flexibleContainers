@@ -92,7 +92,7 @@ function View({
         width: decimalToPercent(width),
         height: decimalToPercent(height),
       }}
-      draggable={false}
+      draggable={!isDragged}
       onMouseMove={onMouseMove}
       onMouseDown={onMouseDown}
       onMouseLeave={onMouseLeave}
