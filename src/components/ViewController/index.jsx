@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import cx from "classnames"
 import _find from 'lodash/find'
 
-import View from './View'
 import { decimalToPercent } from "shared/utils/units"
 import { POSITION } from "./SizeControl";
+import View from './View'
 
 import styles from './styles.scss'
 
@@ -15,6 +15,8 @@ function ViewController({
   width,
   height,
 }) {
+  const containerRef = useRef()
+
   const [ views, setViews ] = useState()
   const [ dragAction, setDragAction ] = useState(null)
 
@@ -41,15 +43,15 @@ function ViewController({
   }
 
   const onMouseMove = ({ clientX, clientY }) => {
+    // TODO: Look into using requestAnimationFrame for this
     if (!dragAction) {
       return
     }
     const { id, origin, direction } = dragAction
 
-    // TODO: Fix bug where sum of all widths > screen width (currently left to browser implementation, but it should prevent resize)
     const sizeDelta = {
-      x: (clientX - origin.x) / window.innerWidth,
-      y: (clientY - origin.y) / window.innerHeight,
+      x: (clientX - origin.x) / containerRef.current.offsetWidth,
+      y: (clientY - origin.y) / containerRef.current.offsetHeight,
     }
 
     const activeView = _find(views, { id })
@@ -153,6 +155,7 @@ function ViewController({
 
   return (
     <div
+      ref={containerRef}
       className={cx(
         styles.controller,
         {
