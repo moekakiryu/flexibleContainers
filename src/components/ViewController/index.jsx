@@ -86,11 +86,8 @@ function ViewController(props) {
     setDragAction(null)
   }
 
+  // Note that this listener is conditionally applied, see component return value below
   const onMouseMove = ({ clientX, clientY }) => {
-    // TODO: Look into using requestAnimationFrame for this
-    if (!dragAction) {
-      return
-    }
     const { id, origin, direction } = dragAction
 
     const sizeDelta = {
@@ -198,7 +195,7 @@ function ViewController(props) {
         width: decimalToPercent(props.width),
         height: decimalToPercent(props.height),
       }}
-      onMouseMove={onMouseMove}
+      onMouseMove={dragAction === null ? null : onMouseMove}
       onMouseUp={onMouseUp}
       onMouseLeave={onMouseLeave}
     >
