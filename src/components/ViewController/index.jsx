@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react"
 import PropTypes from 'prop-types'
 import cx from "classnames"
 import _find from 'lodash/find'
+import _noop from 'lodash/noop'
 
 import { decimalToPercent } from "shared/utils/units"
 import { POSITION } from "./SizeControl";
@@ -207,18 +208,22 @@ function ViewController(props) {
 
 ViewController.propTypes = {
   layout: PropTypes.shape({}).isRequired,
-  width: PropTypes.number.isRequired,
-  height: PropTypes.number.isRequired,
   controllerId: PropTypes.string.isRequired,
-  requestResize: PropTypes.func.isRequired,
+  width: PropTypes.number,
+  height: PropTypes.number,
   neighbors: PropTypes.shape({}),
+  requestResize: PropTypes.func,
   isDragged: PropTypes.bool,
   isVertical: PropTypes.bool,
 }
 
 ViewController.defaultProps = {
-  isVertical: false,
+  width: 1,
+  height: 1,
   neighbors: {},
+  requestResize: _noop,
+  isDragged: false,
+  isVertical: false,
 }
 
 export default ViewController
