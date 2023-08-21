@@ -21,25 +21,29 @@ function ViewController(props) {
     const totalWidth = children.reduce((total, child) => total + child.width, 0)
     const totalHeight = children.reduce((total, child) => total + child.height, 0)
 
-    // Normalize the values in the long axis in case they sum to grater than 100%
     setViews(children.map((child, childIdx) => {
-      const prevChild = children[childIdx - 1]
-      const nextChild = children[childIdx + 1]
+      const hasPrev = !!children[childIdx - 1]
+      const hasNext = !!children[childIdx + 1]
 
+      // Calculate adjacent elements to assist with rendering size controls
       const childNeighbors = props.isVertical ? {
         ...props.neighbors,
-        [POSITION.top]: prevChild || props.neighbors[POSITION.top],
-        [POSITION.bottom]: nextChild || props.neighbors[POSITION.bottom],
+        [POSITION.top]: hasPrev || props.neighbors[POSITION.top],
+        [POSITION.bottom]: hasNext || props.neighbors[POSITION.bottom],
       } : {
         ...props.neighbors,
-        [POSITION.left]: prevChild || props.neighbors[POSITION.left],
-        [POSITION.right]: nextChild || props.neighbors[POSITION.right],
+        [POSITION.left]: hasPrev || props.neighbors[POSITION.left],
+        [POSITION.right]: hasNext || props.neighbors[POSITION.right],
       }
+
+      // Normalize the values in the long axis in case they sum to grater than 100%
+      const childWidth = !props.isVertical ? ( child.width / totalWidth ) : child.width
+      const childHeight = props.isVertical ? ( child.height / totalHeight ) : child.height
 
       return {
         ...child,
-        width: !props.isVertical ? ( child.width / totalWidth ) : child.width,
-        height: props.isVertical ? ( child.height / totalHeight ) : child.height,
+        width: childWidth,
+        height: childHeight,
         neighbors: childNeighbors,
       }
     }))
