@@ -10,10 +10,13 @@ import styles from './styles.scss'
 
 function ViewController({
   layout,
-  isVertical = false,
-  controllerId,
   width,
   height,
+  neighbors,
+  controllerId,
+  // TODO: Rename this or use `props`
+  superRequestResize,
+  isVertical = false,
 }) {
   const containerRef = useRef()
 
@@ -35,7 +38,18 @@ function ViewController({
   }, [layout])
 
   const requestResize = ({ id, direction, origin }) => {
-    setDragAction({ id, origin, direction })
+    const isResizeVertical = (direction === POSITION.top || direction === POSITION.bottom)
+
+    // Resizing should always be done for the long axis so that it aligns with
+    // the flex direction. If the resize request is for the short axis, then
+    // forward the request to the parent container so that the pattern is
+    // maintained.
+    if (isVertical !== isResizeVertical) {
+      superRequestResize({ id: controllerId, direction, origin})
+    // Otherwise handle the request normally
+    } else {
+      setDragAction({ id, origin, direction })
+    }
   }
 
   const stopResize = () => {
@@ -109,7 +123,7 @@ function ViewController({
     stopResize()
   }
 
-  const renderViewContent = () => {
+  const renderChildren = () => {
     // TODO: Use props where possible
     const { children } = layout
 
@@ -117,34 +131,41 @@ function ViewController({
       const prevView = children[viewIdx - 1]
       const nextView = children[viewIdx + 1]
 
+      // TODO: rename this too after changing to props
+      // TODO: If next/prev view are undefined, inherit from props instead
+      const childNeighbors = isVertical ? {
+        ...neighbors,
+        [POSITION.top]: prevView,
+        [POSITION.bottom]: nextView,
+      } : {
+        ...neighbors,
+        [POSITION.left]: prevView,
+        [POSITION.right]: nextView,
+      }
+
       if (view.children?.length > 0) {
         return (
           <ViewController
             key={view.id}
             layout={view}
-            isVertical={!isVertical}
-            controllerId={view.id}
             width={view.width}
+            height={view.height}
+            controllerId={view.id}
+            neighbors={childNeighbors}
+            superRequestResize={requestResize}
+            isVertical={!isVertical}
           />
         )
-      }
-
-      const neighbors = isVertical ? {
-        [POSITION.top]: prevView,
-        [POSITION.bottom]: nextView,
-      } : {
-        [POSITION.left]: prevView,
-        [POSITION.right]: nextView,
       }
 
       return (
         <View
           key={view.id}
-          viewId={view.id}
           width={view.width}
           height={view.height}
-          neighbors={neighbors}
           isDragged={!!dragAction}
+          viewId={view.id}
+          neighbors={childNeighbors}
           requestResize={requestResize}
         />
       )
@@ -170,7 +191,7 @@ function ViewController({
       onMouseUp={onMouseUp}
       onMouseLeave={onMouseLeave}
     >
-      {renderViewContent()}
+      {renderChildren()}
     </div>
   )
 }
