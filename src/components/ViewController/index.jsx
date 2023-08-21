@@ -185,12 +185,9 @@ function ViewController(props) {
   return (
     <div
       ref={containerRef}
-      className={cx(
-        styles.controller,
-        {
-          [styles.vertical]: props.isVertical
-        }
-      )}
+      className={cx(styles.controller, {
+        [styles.vertical]: props.isVertical
+      })}
       style={{
         width: decimalToPercent(props.width),
         height: decimalToPercent(props.height),
