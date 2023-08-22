@@ -1,14 +1,9 @@
 import React from "react";
 import cx from "classnames";
 
-import styles from './styles.scss'
+import { DIRECTION } from "shared/utils/constants";
 
-export const POSITION = {
-  top: 'top',
-  bottom: 'bottom',
-  left: 'left',
-  right: 'right',
-}
+import styles from './styles.scss'
 
 function SizeControl({ position }) {
   // Note: Below we could create a mapping from POSITION values to their
@@ -19,10 +14,10 @@ function SizeControl({ position }) {
       className={cx(
         styles.sizeControl,
         {
-          [styles.top]:    position === POSITION.top,
-          [styles.bottom]: position === POSITION.bottom,
-          [styles.left]:   position === POSITION.left,
-          [styles.right]:  position === POSITION.right,
+          [styles.top]:    position === DIRECTION.top,
+          [styles.bottom]: position === DIRECTION.bottom,
+          [styles.left]:   position === DIRECTION.left,
+          [styles.right]:  position === DIRECTION.right,
         }
       )}
     />

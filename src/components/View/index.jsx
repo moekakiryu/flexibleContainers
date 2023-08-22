@@ -2,7 +2,8 @@ import React, { useState, useRef } from 'react'
 // import PropTypes from 'prop-types'
 
 import { decimalToPercent } from 'shared/utils/units'
-import SizeControl, { POSITION } from "../SizeControl"
+import { DIRECTION } from 'shared/utils/constants'
+import SizeControl from "../SizeControl"
 
 import styles from './styles.scss'
 
@@ -27,10 +28,10 @@ function View({
     }
 
     const activeRegions = {
-      [POSITION.left]:   mouseOffset.x < options.regionSize,
-      [POSITION.top]:    mouseOffset.y < options.regionSize,
-      [POSITION.right]:  1 - mouseOffset.x < options.regionSize,
-      [POSITION.bottom]: 1 - mouseOffset.y < options.regionSize,
+      [DIRECTION.left]:   mouseOffset.x < options.regionSize,
+      [DIRECTION.top]:    mouseOffset.y < options.regionSize,
+      [DIRECTION.right]:  1 - mouseOffset.x < options.regionSize,
+      [DIRECTION.bottom]: 1 - mouseOffset.y < options.regionSize,
     }
 
     return activeRegions

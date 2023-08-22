@@ -5,7 +5,7 @@ import _find from 'lodash/find'
 import _noop from 'lodash/noop'
 
 import { decimalToPercent } from "shared/utils/units"
-import { POSITION } from "../SizeControl";
+import { DIRECTION } from "shared/utils/constants"
 import View from '../View'
 
 import styles from './styles.scss'
@@ -29,12 +29,12 @@ function ViewController(props) {
       // Calculate adjacent elements to assist with rendering size controls
       const childNeighbors = props.isVertical ? {
         ...props.neighbors,
-        [POSITION.top]: hasPrev || props.neighbors[POSITION.top],
-        [POSITION.bottom]: hasNext || props.neighbors[POSITION.bottom],
+        [DIRECTION.top]: hasPrev || props.neighbors[DIRECTION.top],
+        [DIRECTION.bottom]: hasNext || props.neighbors[DIRECTION.bottom],
       } : {
         ...props.neighbors,
-        [POSITION.left]: hasPrev || props.neighbors[POSITION.left],
-        [POSITION.right]: hasNext || props.neighbors[POSITION.right],
+        [DIRECTION.left]: hasPrev || props.neighbors[DIRECTION.left],
+        [DIRECTION.right]: hasNext || props.neighbors[DIRECTION.right],
       }
 
       // Normalize the values in the long axis in case they sum to grater than 100%
@@ -56,18 +56,18 @@ function ViewController(props) {
   ])
 
   const requestResize = ({ id, direction, origin }) => {
-    const isResizeVertical = (direction === POSITION.top || direction === POSITION.bottom)
+    const isResizeVertical = (direction === DIRECTION.top || direction === DIRECTION.bottom)
 
     const isFirstChild = views?.[0].id === id
     const isLastChild = views?.[views.length - 1].id === id
 
     const isBeyondHorizontalBounds = !props.isVertical && (
-      (isFirstChild && direction === POSITION.left) ||
-      (isLastChild && direction === POSITION.right)
+      (isFirstChild && direction === DIRECTION.left) ||
+      (isLastChild && direction === DIRECTION.right)
     )
     const isBeyondVerticalBounds = props.isVertical && (
-      (isFirstChild && direction === POSITION.up) ||
-      (isLastChild && direction === POSITION.down)
+      (isFirstChild && direction === DIRECTION.up) ||
+      (isLastChild && direction === DIRECTION.down)
     )
 
     // Resizing should always be done for the long axis so that it aligns with
@@ -105,28 +105,28 @@ function ViewController(props) {
     const nextView = views[views.indexOf(activeView) + 1]
 
     switch (direction) {
-      case POSITION.left:
+      case DIRECTION.left:
         if (prevView) {
           activeView.width -= sizeDelta.x
           prevView.width += sizeDelta.x
         }
         break
 
-      case POSITION.right:
+      case DIRECTION.right:
         if (nextView) {
           activeView.width += sizeDelta.x
           nextView.width -= sizeDelta.x
         }
         break
 
-      case POSITION.top:
+      case DIRECTION.top:
         if (prevView) {
           activeView.height -= sizeDelta.y
           prevView.height += sizeDelta.y
         }
         break
 
-      case POSITION.bottom:
+      case DIRECTION.bottom:
         if (nextView) {
           activeView.height += sizeDelta.y
           nextView.height -= sizeDelta.y
