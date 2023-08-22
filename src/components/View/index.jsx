@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react'
 // import PropTypes from 'prop-types'
 
-import { decimalToPercent } from 'shared/utils/units'
 import { DIRECTION } from 'shared/utils/constants'
 import SizeControl from "../SizeControl"
 
@@ -90,8 +89,8 @@ function View({
       ref={containerRef}
       className={styles.view}
       style={{
-        width: decimalToPercent(width),
-        height: decimalToPercent(height),
+        width:  `${width * 100}%`,
+        height: `${height * 100}%`,
       }}
       draggable={!isDragged}
       onMouseMove={onMouseMove}

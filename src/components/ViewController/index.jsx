@@ -4,7 +4,6 @@ import cx from "classnames"
 import _find from 'lodash/find'
 import _noop from 'lodash/noop'
 
-import { decimalToPercent } from "shared/utils/units"
 import { DIRECTION } from "shared/utils/constants"
 import View from '../View'
 
@@ -194,8 +193,8 @@ function ViewController(props) {
         [styles.vertical]: props.isVertical
       })}
       style={{
-        width: decimalToPercent(props.width),
-        height: decimalToPercent(props.height),
+        width:  `${props.width * 100}%`,
+        height: `${props.height * 100}%`,
       }}
       onMouseMove={dragAction === null ? null : onMouseMove}
       onMouseUp={onMouseUp}
