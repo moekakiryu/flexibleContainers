@@ -5,8 +5,8 @@ import _find from 'lodash/find'
 import _noop from 'lodash/noop'
 
 import { decimalToPercent } from "shared/utils/units"
-import { POSITION } from "./SizeControl";
-import View from './View'
+import { POSITION } from "../SizeControl";
+import View from '../View'
 
 import styles from './styles.scss'
 
