@@ -1,6 +1,6 @@
 export const DIRECTION = {
-    up: 'up',
-    down: 'down',
+    top: 'top',
+    bottom: 'bottom',
     left: 'left',
     right: 'right,'
 }
