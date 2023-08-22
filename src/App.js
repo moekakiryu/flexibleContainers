@@ -1,4 +1,4 @@
-import ViewController from "components/ViewController";
+import ViewController from 'components/ViewController'
 
 const defaultLayout = {
   children: [

@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef } from "react"
+import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
-import cx from "classnames"
+import cx from 'classnames'
 import _find from 'lodash/find'
 import _noop from 'lodash/noop'
 
-import { DIRECTION } from "shared/utils/constants"
-import View from '../View'
+import { DIRECTION } from 'shared/utils/constants'
+import View from 'components/View'
 
 import styles from './styles.scss'
 

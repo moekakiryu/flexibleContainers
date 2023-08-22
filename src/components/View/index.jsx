@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react'
 // import PropTypes from 'prop-types'
 
 import { DIRECTION } from 'shared/utils/constants'
-import SizeControl from "../SizeControl"
+import SizeControl from 'components/SizeControl'
 
 import styles from './styles.scss'
 
