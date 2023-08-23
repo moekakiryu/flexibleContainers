@@ -61,11 +61,43 @@ const defaultLayout = {
   ]
 }
 
+const debugLayout = {
+  children: [
+    {
+      id: 'c1',
+      width: ( 1 / 4 ),
+      height: 1,
+      children: [
+        {
+          id: 'r1',
+          width: 1,
+          height: ( 1 / 3 ),
+        },
+        {
+          id: 'r2',
+          width: 1,
+          height: ( 1 / 3 ),
+        },
+        {
+          id: 'r3',
+          width: 1,
+          height: ( 1 / 3 ),
+        }
+      ]
+    },
+    {
+      id: 'c2',
+      width: ( 3 / 4 ),
+      height: 1,
+    }
+  ]
+}
+
 function App() {
   return (
     <ViewController
       controllerId="root"
-      layout={defaultLayout}
+      layout={debugLayout}
     />
   );
 }
