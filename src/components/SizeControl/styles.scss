@@ -1,21 +1,21 @@
 @import 'shared/styles';
 
-$control-width: 8rem;
+$control-width: 100%;
 
 // 1. Size controls (same for horizontal/vertical positions)
 //    Also, place the element on the appropriate x/y axis
 // 2. Location controls (different for each)
 .sizeControl {
-    @include rounded('lg');
+    @include rounded('md');
 
     z-index: 1;
     position: absolute;
     display: inline-block;
-    height: calc($control-width / 12);
-    width: calc($control-width / 12);
+    height: .6rem; // calc($control-width / 12);
+    width: .6rem; // calc($control-width / 12);
 
     opacity: 70;
-    background-color: $color__black;
+    background-color: red;
     pointer-events: none;
 
     // [1]
@@ -23,7 +23,7 @@ $control-width: 8rem;
     &.bottom {
         left: 50%;
         width: $control-width;
-        max-width: 50%;
+        // max-width: 50%;
 
         transform: translateX(-50%);
     }
@@ -32,7 +32,7 @@ $control-width: 8rem;
     &.right {
         top: 50%;
         height: $control-width;
-        max-height: 50%;
+        // max-height: 50%;
 
         transform: translateY(-50%);
     }
@@ -40,17 +40,21 @@ $control-width: 8rem;
     // [2]
     &.top {
         top: $spacing__xs;
+        top: -.4rem;
     }
 
     &.bottom {
         bottom: $spacing__xs;
+        bottom: -.4rem;
     }
 
     &.left {
         left: $spacing__xs;
+        left: -.4rem;
     }
 
     &.right {
         right: $spacing__xs;
+        right: -.4rem;
     }
 }
