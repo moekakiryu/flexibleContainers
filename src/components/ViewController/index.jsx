@@ -72,18 +72,10 @@ function ViewController(props) {
 
   const requestResize = ({ id, direction, origin }) => {
     const isResizeVertical = (direction === DIRECTION.top || direction === DIRECTION.bottom)
+    const isResizeBeforeView = (direction === DIRECTION.top || direction === DIRECTION.left)
 
     const isFirstChild = views?.[0].id === id
     const isLastChild = views?.[views.length - 1].id === id
-
-    const isBeyondHorizontalBounds = !props.isVertical && (
-      (isFirstChild && direction === DIRECTION.left) ||
-      (isLastChild && direction === DIRECTION.right)
-    )
-    const isBeyondVerticalBounds = props.isVertical && (
-      (isFirstChild && direction === DIRECTION.up) ||
-      (isLastChild && direction === DIRECTION.down)
-    )
 
     // Resizing should always be done for the long axis so that it aligns with
     // the flex direction. If the resize request is for the short axis, then
@@ -94,7 +86,7 @@ function ViewController(props) {
     // If we are trying to resize in a direction that isn't possible
     // (eg left for the first child), pass thre resize request to the parent to
     // handle.
-    } else if (isBeyondHorizontalBounds || isBeyondVerticalBounds) {
+    } else if ((isFirstChild && isResizeBeforeView) || (isLastChild && !isResizeBeforeView)) {
       props.requestResize({ id: props.controllerId, direction, origin })
     // Otherwise handle the request normally
     } else {
