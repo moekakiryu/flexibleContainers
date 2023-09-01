@@ -63,7 +63,7 @@ function ViewController(props) {
         neighbors: childNeighbors,
       }
     }))
-  // Note that none of these props are expected to change frequently
+  // Note that all of these props are expected to change very infrequently
   }, [
     props.layout,
     props.neighbors,

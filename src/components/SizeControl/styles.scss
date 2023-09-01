@@ -18,6 +18,8 @@ $icon-diameter: 4rem;
     background-color: rgba(#fff, 10%);
     backdrop-filter: blur(.5rem);
 
+    animation: fadein .25s;
+
     // [1]
     &.top,
     &.bottom {
@@ -78,12 +80,14 @@ $icon-diameter: 4rem;
     height: $icon-diameter;
     width: $icon-diameter;
 
-    transform: translateY(-50%);
-
     background-color: white;
     border: $margin-size solid white;
 
     cursor: pointer;
+
+    .top & {
+        transform: translateY(-50%);
+    }
 
     .bottom & {
         transform: translateY(50%);
@@ -113,5 +117,15 @@ $icon-diameter: 4rem;
 
         background-color: transparent;
         border: .2rem solid black;
+    }
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0%;
+    }
+
+    to {
+        opacity: 100%;
     }
 }

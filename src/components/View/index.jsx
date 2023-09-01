@@ -6,6 +6,8 @@ import SizeControl from 'components/SizeControl'
 
 import styles from './styles.scss'
 
+const HOVER_DELAY = 350 // ms
+
 function View({
   width,
   height,
@@ -18,6 +20,7 @@ function View({
   ...otherProps
 }) {
   const containerRef = useRef()
+  const controlHoverTimeout = useRef(null)
 
   const [ activeControl, setActiveControl ] = useState(null)
 
@@ -51,6 +54,11 @@ function View({
     return null
   }
 
+  const clearControlHover = () => {
+    clearTimeout(controlHoverTimeout.current)
+    controlHoverTimeout.current = null
+  }
+
   const resizeView = ({ mouseX, mouseY, direction }) => {
     if (!isDragged && activeControl) {
       requestResize({
@@ -69,14 +77,23 @@ function View({
     const controlRegions = getControlRegions(containerRef.current, clientX, clientY)
     const newActiveControl = filterControlRegions(controlRegions)
 
-    // IMPORTANT: Page components can NOT be children of this component or else they will ALWAYS re-render on mouse move
-    //            Use an alternate method to render them or use shouldComponentUpdate
     if (!isDragged && activeControl !== newActiveControl) {
-      setActiveControl(newActiveControl)
+      clearControlHover()
+
+      if (newActiveControl != null) {
+        controlHoverTimeout.current = setTimeout(() => {
+          setActiveControl(newActiveControl)
+        }, HOVER_DELAY)
+      } else {
+        setActiveControl(null)
+      }
+    } else if (newActiveControl === null && controlHoverTimeout.current != null) {
+      clearControlHover()
     }
   }
 
   const onMouseLeave = () => {
+    clearControlHover()
     if (!isDragged) {
       setActiveControl(null)
     }
