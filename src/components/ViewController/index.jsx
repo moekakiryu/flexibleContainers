@@ -106,132 +106,83 @@ function ViewController(props) {
   }
 
   const insertView = ({ id, direction }) => {
-    // TODO: Merge as much as possible with the code in useEffect, this is currently a very WET solution
     const isActionVertical = (direction === DIRECTION.top || direction === DIRECTION.bottom)
+    const isInsertionBeforeView = (direction === DIRECTION.top || direction === DIRECTION.left)
 
     const activeView = _find(views, { id })
     const viewIndex = views.indexOf(activeView)
+
     const prevView = views[viewIndex - 1]
     const nextView = views[viewIndex + 1]
 
-    const newChild = {
-      id: getRandomId()
+    const complementView = isInsertionBeforeView ? prevView : nextView
+    const complementDirection = (
+      direction === DIRECTION.top ? DIRECTION.bottom :
+      direction === DIRECTION.bottom ? DIRECTION.top :
+      direction === DIRECTION.left ? DIRECTION.right :
+      direction === DIRECTION.right ? DIRECTION.left :
+      null
+    )
+
+    const newView = {
+      id: getRandomId(),
+      width: isActionVertical ? 1 : activeView.width / 2,
+      height: isActionVertical ? activeView.height / 2 : 1,
+      neighbors: {}
     }
 
-    if (props.isVertical === isActionVertical) {
-      newChild.width = props.isVertical ? 1 : activeView.width / 2
-      newChild.height = props.isVertical ? activeView.height / 2 : 1
-
-      switch (direction) {
-        case DIRECTION.top:
-          newChild.neighbors = {
-            ...prevView.neighbors,
-            [DIRECTION.top]: true
-          }
-          prevView.neighbors[DIRECTION.bottom] = true
-          break
-        case DIRECTION.bottom:
-          newChild.neighbors = {
-            ...nextView.neighbors,
-            [DIRECTION.bottom]: true
-          }
-          nextView.neighbors[DIRECTION.top] = true
-          break;
-        case DIRECTION.left:
-          newChild.neighbors = {
-            ...prevView.neighbors,
-            [DIRECTION.left]: true
-          }
-          prevView.neighbors[DIRECTION.right] = true
-          break
-        case DIRECTION.right:
-          newChild.neighbors = {
-            ...nextView.neighbors,
-            [DIRECTION.right]: true
-          }
-          nextView.neighbors[DIRECTION.left] = true
-          break
-        default:
-          console.error(`Unknown direction: ${direction}`)
-      }
-    } else {
-      newChild.width = activeView.width
-      newChild.height = activeView.height
-      newChild.neighbors = {...activeView.neighbors}
-
-      if (isActionVertical) {
-        activeView.width = 1
-      } else {
-        activeView.height = 1
-      }
-
-      const subView = {
-        id: getRandomId(),
-        width: isActionVertical ? 1 : activeView.width / 2,
-        height: isActionVertical ? activeView.height / 2 : 1,
-        neighbors: {}
-      }
-
-      switch (direction) {
-        case DIRECTION.top:
-          subView.neighbors = {
-            ...activeView.neighbors,
-            [DIRECTION.bottom]: true
-          }
-          activeView.neighbors = {
-            ...activeView.neighbors,
-            [DIRECTION.top]: true
-          }
-          break
-        case DIRECTION.bottom:
-          subView.neighbors = {
-            ...activeView.neighbors,
-            [DIRECTION.top]: true
-          }
-          activeView.neighbors = {
-            ...activeView.neighbors,
-            [DIRECTION.bottom]: true
-          }
-          break
-        case DIRECTION.left:
-          subView.neighbors = {
-            ...activeView.neighbors,
-            [DIRECTION.right]: true
-          }
-          activeView.neighbors = {
-            ...activeView.neighbors,
-            [DIRECTION.left]: true
-          }
-          break
-        case DIRECTION.right:
-          subView.neighbors = {
-            ...activeView.neighbors,
-            [DIRECTION.left]: true
-          }
-          activeView.neighbors = {
-            ...activeView.neighbors,
-            [DIRECTION.right]: true
-          }
-          break
-        default:
-          console.error(`Unknown direction: ${direction}`)
-      }
-      newChild.children = direction === DIRECTION.top || direction === DIRECTION.left ? [ subView, activeView ] : [ activeView, subView ]
+    const newContainer = {
+      id: getRandomId(),
+      width: activeView.width,
+      height: activeView.height,
+      neighbors: { ...activeView.neighbors },
+      children: isInsertionBeforeView ? [ newView, activeView ] : [ activeView, newView ]
     }
 
-
+    // Halve the size of the long axis to make room for the newly inserted view
     if (isActionVertical) {
       activeView.height /= 2
     } else {
       activeView.width /= 2
     }
 
-    const newViewArray = [
-      ...views.slice(0, viewIndex),
-      newChild,
-      ...views.slice(props.isVertical === isActionVertical ? viewIndex : viewIndex + 1)
-    ]
-    setViews(newViewArray)
+    if (props.isVertical === isActionVertical) {
+      // Since we are not updating props.neighbors (and therefor not triggering
+      // useEffect), we must manually update the neighbors here
+      if (complementView) {
+        newView.neighbors = {
+          ...complementView.neighbors,
+          [direction]: true
+        }
+        complementView.neighbors[complementDirection] = true
+      } else {
+        newView.neighbors = {
+          ...props.neighbors,
+          [direction]: true
+        }
+      }
+
+      setViews([
+        ...views.slice(0, viewIndex),
+        newView,
+        ...views.slice(viewIndex)
+      ])
+    } else {
+      // Ensure the new short axis spans the width of the container
+      if (isActionVertical) {
+        activeView.width = 1
+      } else {
+        activeView.height = 1
+      }
+
+      // Add in the new container, and also remove the old activeView, which
+      // is now a child of said container
+      setViews([
+        ...views.slice(0, viewIndex),
+        newContainer,
+        ...views.slice(viewIndex + 1)
+      ])
+    }
   }
 
   // Note that this listener is conditionally applied, see component return value below
