@@ -1,3 +1,5 @@
+// TODO: Clean this file
+
 import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
@@ -8,6 +10,18 @@ import { DIRECTION } from 'shared/utils/constants'
 import View from 'components/View'
 
 import styles from './styles.scss'
+
+const getRandomId = () => `${Math.floor(Math.random() * 1e12)}`
+
+/*
+ * View => {
+ *   id: str,
+ *   width: number,
+ *   height: number,
+ *   children: View[],
+ *   neighbors: View{0,4},
+ * }
+ */
 
 function ViewController(props) {
   const containerRef = useRef()
@@ -21,6 +35,7 @@ function ViewController(props) {
     const totalWidth = children.reduce((total, child) => total + child.width, 0)
     const totalHeight = children.reduce((total, child) => total + child.height, 0)
 
+    // Sanitize and process layout from props
     setViews(children.map((child, childIdx) => {
       const hasPrev = !!children[childIdx - 1]
       const hasNext = !!children[childIdx + 1]
@@ -88,6 +103,135 @@ function ViewController(props) {
 
   const stopResize = () => {
     setDragAction(null)
+  }
+
+  const insertView = ({ id, direction }) => {
+    // TODO: Merge as much as possible with the code in useEffect, this is currently a very WET solution
+    const isActionVertical = (direction === DIRECTION.top || direction === DIRECTION.bottom)
+
+    const activeView = _find(views, { id })
+    const viewIndex = views.indexOf(activeView)
+    const prevView = views[viewIndex - 1]
+    const nextView = views[viewIndex + 1]
+
+    const newChild = {
+      id: getRandomId()
+    }
+
+    if (props.isVertical === isActionVertical) {
+      newChild.width = props.isVertical ? 1 : activeView.width / 2
+      newChild.height = props.isVertical ? activeView.height / 2 : 1
+
+      switch (direction) {
+        case DIRECTION.top:
+          newChild.neighbors = {
+            ...prevView.neighbors,
+            [DIRECTION.top]: true
+          }
+          prevView.neighbors[DIRECTION.bottom] = true
+          break
+        case DIRECTION.bottom:
+          newChild.neighbors = {
+            ...nextView.neighbors,
+            [DIRECTION.bottom]: true
+          }
+          nextView.neighbors[DIRECTION.top] = true
+          break;
+        case DIRECTION.left:
+          newChild.neighbors = {
+            ...prevView.neighbors,
+            [DIRECTION.left]: true
+          }
+          prevView.neighbors[DIRECTION.right] = true
+          break
+        case DIRECTION.right:
+          newChild.neighbors = {
+            ...nextView.neighbors,
+            [DIRECTION.right]: true
+          }
+          nextView.neighbors[DIRECTION.left] = true
+          break
+        default:
+          console.error(`Unknown direction: ${direction}`)
+      }
+    } else {
+      newChild.width = activeView.width
+      newChild.height = activeView.height
+      newChild.neighbors = {...activeView.neighbors}
+
+      if (isActionVertical) {
+        activeView.width = 1
+      } else {
+        activeView.height = 1
+      }
+
+      const subView = {
+        id: getRandomId(),
+        width: isActionVertical ? 1 : activeView.width / 2,
+        height: isActionVertical ? activeView.height / 2 : 1,
+        neighbors: {}
+      }
+
+      switch (direction) {
+        case DIRECTION.top:
+          subView.neighbors = {
+            ...activeView.neighbors,
+            [DIRECTION.bottom]: true
+          }
+          activeView.neighbors = {
+            ...activeView.neighbors,
+            [DIRECTION.top]: true
+          }
+          break
+        case DIRECTION.bottom:
+          subView.neighbors = {
+            ...activeView.neighbors,
+            [DIRECTION.top]: true
+          }
+          activeView.neighbors = {
+            ...activeView.neighbors,
+            [DIRECTION.bottom]: true
+          }
+          break
+        case DIRECTION.left:
+          subView.neighbors = {
+            ...activeView.neighbors,
+            [DIRECTION.right]: true
+          }
+          activeView.neighbors = {
+            ...activeView.neighbors,
+            [DIRECTION.left]: true
+          }
+          break
+        case DIRECTION.right:
+          subView.neighbors = {
+            ...activeView.neighbors,
+            [DIRECTION.left]: true
+          }
+          activeView.neighbors = {
+            ...activeView.neighbors,
+            [DIRECTION.right]: true
+          }
+          break
+        default:
+          console.error(`Unknown direction: ${direction}`)
+      }
+      newChild.children = direction === DIRECTION.top || direction === DIRECTION.left ? [ subView, activeView ] : [ activeView, subView ]
+    }
+
+
+    if (isActionVertical) {
+      activeView.height /= 2
+    } else {
+      activeView.width /= 2
+    }
+
+    const newViewArray = [
+      ...views.slice(0, viewIndex),
+      newChild,
+      ...views.slice(props.isVertical === isActionVertical ? viewIndex : viewIndex + 1)
+    ]
+    setViews(newViewArray)
   }
 
   // Note that this listener is conditionally applied, see component return value below
@@ -182,6 +326,7 @@ function ViewController(props) {
         neighbors={view.neighbors}
         isDragged={!!dragAction || props.isDragged}
         requestResize={requestResize}
+        requestInsertion={insertView}
       />
     )
   })

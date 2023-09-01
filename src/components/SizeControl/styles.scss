@@ -1,60 +1,117 @@
+@use 'sass:math';
 @import 'shared/styles';
 
-$control-width: 100%;
+$control-span: 100%;
+$margin-size: .4rem;
+$icon-diameter: 4rem;
 
 // 1. Size controls (same for horizontal/vertical positions)
 //    Also, place the element on the appropriate x/y axis
 // 2. Location controls (different for each)
 .sizeControl {
-    @include rounded('md');
-
     z-index: 1;
-    position: absolute;
-    display: inline-block;
-    height: .6rem; // calc($control-width / 12);
-    width: .6rem; // calc($control-width / 12);
 
-    opacity: 70;
-    background-color: red;
-    pointer-events: none;
+    position: absolute;
+    display: flex;
+    align-items: center;
+
+    background-color: rgba(#fff, 10%);
+    backdrop-filter: blur(.5rem);
 
     // [1]
     &.top,
     &.bottom {
+        flex-direction: column;
+
         left: 50%;
-        width: $control-width;
-        // max-width: 50%;
+        width: calc( $control-span - 2 * $margin-size );
+        margin: $margin-size 0;
 
         transform: translateX(-50%);
+
+        cursor: row-resize;
     }
 
     &.left,
     &.right {
+        flex-direction: row;
+
         top: 50%;
-        height: $control-width;
-        // max-height: 50%;
+        height: calc( $control-span - 2 * $margin-size );
+        margin: 0 $margin-size;
 
         transform: translateY(-50%);
+
+        cursor: col-resize;
     }
 
     // [2]
     &.top {
-        top: $spacing__xs;
-        top: -.4rem;
+        top: 0;
     }
 
     &.bottom {
-        bottom: $spacing__xs;
-        bottom: -.4rem;
+        bottom: 0;
     }
 
     &.left {
-        left: $spacing__xs;
-        left: -.4rem;
+        left: 0;
     }
 
     &.right {
-        right: $spacing__xs;
-        right: -.4rem;
+        right: 0;
+    }
+}
+
+// 1. Place a black border around the button (the traditional border is being
+//    used to add extra white padding)
+.addButton {
+    @include rounded(circle);
+
+    z-index: 1;
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: $icon-diameter;
+    width: $icon-diameter;
+
+    transform: translateY(-50%);
+
+    background-color: white;
+    border: $margin-size solid white;
+
+    cursor: pointer;
+
+    .bottom & {
+        transform: translateY(50%);
+    }
+
+    .right & {
+        transform: translateX(50%);
+    }
+
+    .left & {
+        transform: translateX(-50%);
+    }
+
+    &:hover,
+    &:focus {
+        background-color: $color__grey-10;
+    }
+
+    &::after { // [1]
+        @include rounded('circle');
+        content: "";
+
+        position: absolute;
+
+        width: 100%;
+        height: 100%;
+
+        background-color: transparent;
+        border: .2rem solid black;
     }
 }

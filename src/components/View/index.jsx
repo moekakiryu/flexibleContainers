@@ -12,11 +12,13 @@ function View({
   neighbors,
   isDragged,
   requestResize,
+  requestInsertion,
   viewId,
   component,
   ...otherProps
 }) {
   const containerRef = useRef()
+
   const [ activeControl, setActiveControl ] = useState(null)
 
   // TODO: This should not be percentage based (small view = tiny region size)
@@ -37,10 +39,6 @@ function View({
   }
 
   /**
-   * Get the property name of a true value in a JS object. If multiple values
-   * are true, only the first will be returned. Which one is first is up to the
-   * JS implementation.
-   *
    * @param {*} regions A key/value boolean mapping
    * @returns The name of a true property or undefined
    */
@@ -53,6 +51,20 @@ function View({
     return null
   }
 
+  const resizeView = ({ mouseX, mouseY, direction }) => {
+    if (!isDragged && activeControl) {
+      requestResize({
+        id: viewId,
+        direction,
+        origin: { x: mouseX, y: mouseY }
+      })
+    }
+  }
+
+  const createView = ({ direction }) => {
+    requestInsertion({ id: viewId, direction })
+  }
+
   const onMouseMove = ({ clientX, clientY }) => {
     const controlRegions = getControlRegions(containerRef.current, clientX, clientY)
     const newActiveControl = filterControlRegions(controlRegions)
@@ -61,19 +73,6 @@ function View({
     //            Use an alternate method to render them or use shouldComponentUpdate
     if (!isDragged && activeControl !== newActiveControl) {
       setActiveControl(newActiveControl)
-    }
-  }
-
-  const onMouseDown = ({ clientX, clientY }) => {
-    if (activeControl) {
-      requestResize({
-        id: viewId,
-        direction: activeControl,
-        origin: {
-          x: clientX,
-          y: clientY,
-        }
-      })
     }
   }
 
@@ -92,13 +91,16 @@ function View({
         width:  `${width * 100}%`,
         height: `${height * 100}%`,
       }}
-      draggable={!isDragged}
+      draggable={!activeControl}
       onMouseMove={onMouseMove}
-      onMouseDown={onMouseDown}
       onMouseLeave={onMouseLeave}
       {...otherProps}
     >
-      <SizeControl position={activeControl} />
+      <SizeControl
+        position={activeControl}
+        onCreate={createView}
+        onResize={resizeView}
+      />
       <div className={styles.content}>{component}</div>
     </div>
   )
