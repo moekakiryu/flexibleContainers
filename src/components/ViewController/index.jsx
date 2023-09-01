@@ -11,6 +11,7 @@ import View from 'components/View'
 
 import styles from './styles.scss'
 
+// TODO: Replace this with UUID or similar
 const getRandomId = () => `${Math.floor(Math.random() * 1e12)}`
 
 /*
@@ -112,11 +113,7 @@ function ViewController(props) {
     const activeView = _find(views, { id })
     const viewIndex = views.indexOf(activeView)
 
-    const prevView = views[viewIndex - 1]
-    const nextView = views[viewIndex + 1]
-
-    const complementView = isInsertionBeforeView ? prevView : nextView
-    const complementDirection = (
+    const oppositeDirection = (
       direction === DIRECTION.top ? DIRECTION.bottom :
       direction === DIRECTION.bottom ? DIRECTION.top :
       direction === DIRECTION.left ? DIRECTION.right :
@@ -126,9 +123,17 @@ function ViewController(props) {
 
     const newView = {
       id: getRandomId(),
+      // The new view should take up half of the old views space
       width: isActionVertical ? 1 : activeView.width / 2,
       height: isActionVertical ? activeView.height / 2 : 1,
-      neighbors: {}
+      // The new view will displace the active view
+      // eg direction = down --> new view will be in bottom half of old space,
+      //    pushing the active view up, M=meaning the opposite neighbor is
+      //    guarunteed
+      neighbors: {
+        ...activeView.neighbors,
+        [oppositeDirection]: true
+      }
     }
 
     const newContainer = {
@@ -147,28 +152,14 @@ function ViewController(props) {
     }
 
     if (props.isVertical === isActionVertical) {
-      // Since we are not updating props.neighbors (and therefor not triggering
-      // useEffect), we must manually update the neighbors here
-      if (complementView) {
-        newView.neighbors = {
-          ...complementView.neighbors,
-          [direction]: true
-        }
-        complementView.neighbors[complementDirection] = true
-      } else {
-        newView.neighbors = {
-          ...props.neighbors,
-          [direction]: true
-        }
-      }
-
       setViews([
         ...views.slice(0, viewIndex),
-        newView,
-        ...views.slice(viewIndex)
+        ...isInsertionBeforeView ? [ newView, activeView ] : [ activeView, newView ],
+        ...views.slice(viewIndex + 1)
       ])
     } else {
-      // Ensure the new short axis spans the width of the container
+      // Since we are swapping orientations, reset new short axis to 100% of
+      // container size
       if (isActionVertical) {
         activeView.width = 1
       } else {
