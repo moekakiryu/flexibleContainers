@@ -15,8 +15,9 @@ $icon-diameter: 4rem;
     display: flex;
     align-items: center;
 
-    background-color: rgba(#fff, 10%);
-    backdrop-filter: blur(.5rem);
+    background-color: rgba(#000, 10%);
+    height: 2rem;
+    width: 2rem;
 
     animation: fadein .25s;
 
@@ -24,6 +25,7 @@ $icon-diameter: 4rem;
     &.top,
     &.bottom {
         flex-direction: column;
+        width: 100%;
 
         left: 50%;
         width: calc( $control-span - 2 * $margin-size );
@@ -37,6 +39,7 @@ $icon-diameter: 4rem;
     &.left,
     &.right {
         flex-direction: row;
+        height: 100%;
 
         top: 50%;
         height: calc( $control-span - 2 * $margin-size );
@@ -72,7 +75,7 @@ $icon-diameter: 4rem;
 
     z-index: 1;
 
-    position: relative;
+    position: absolute;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -86,19 +89,19 @@ $icon-diameter: 4rem;
     cursor: pointer;
 
     .top & {
-        transform: translateY(-50%);
+        top: .4rem;
     }
 
     .bottom & {
-        transform: translateY(50%);
+        bottom: .4rem;
     }
 
     .right & {
-        transform: translateX(50%);
+        right: .4rem;
     }
 
     .left & {
-        transform: translateX(-50%);
+        left: .4rem;
     }
 
     &:hover,

@@ -6,7 +6,7 @@ import SizeControl from 'components/SizeControl'
 
 import styles from './styles.scss'
 
-const HOVER_DELAY = 350 // ms
+const HOVER_DELAY = 200 // ms
 
 function View({
   viewId,
@@ -25,7 +25,7 @@ function View({
   const [ activeControl, setActiveControl ] = useState(null)
 
   // TODO: This should not be percentage based (small view = tiny region size)
-  const getControlRegions = (container, mouseX, mouseY, options = { regionSize: 45 }) => {
+  const getControlRegions = (container, mouseX, mouseY, options = { regionSize: 30 }) => {
     const mouseOffset = {
       x: (mouseX - container.offsetLeft), // container.offsetWidth,
       y: (mouseY - container.offsetTop) // container.offsetHeight,
@@ -53,9 +53,21 @@ function View({
     return null
   }
 
+  const waitForControlHover = (control) => {
+    controlHoverTimeout.current = setTimeout(() => {
+      setActiveControl(control)
+    }, HOVER_DELAY)
+  }
+
   const clearControlHover = () => {
     clearTimeout(controlHoverTimeout.current)
     controlHoverTimeout.current = null
+  }
+
+  const clearActiveControl = () => {
+    if (!isDragged) {
+      setActiveControl(null)
+    }
   }
 
   const resizeView = useCallback(({ mouseX, mouseY, direction }) => {
@@ -88,11 +100,9 @@ function View({
       clearControlHover()
 
       if (newActiveControl != null) {
-        controlHoverTimeout.current = setTimeout(() => {
-          setActiveControl(newActiveControl)
-        }, HOVER_DELAY)
+        waitForControlHover(newActiveControl)
       } else {
-        setActiveControl(null)
+        clearActiveControl()
       }
     } else if (newActiveControl === null && controlHoverTimeout.current != null) {
       clearControlHover()
@@ -101,9 +111,7 @@ function View({
 
   const onMouseLeave = () => {
     clearControlHover()
-    if (!isDragged) {
-      setActiveControl(null)
-    }
+    clearActiveControl()
   }
 
   // TODO: Otherprops should be passed to the viewed component
@@ -124,6 +132,7 @@ function View({
         position={activeControl}
         onCreate={createView}
         onResize={resizeView}
+        onLeave={clearActiveControl}
       />
       <div className={styles.content}>{component}</div>
     </div>

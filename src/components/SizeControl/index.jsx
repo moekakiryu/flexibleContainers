@@ -6,7 +6,7 @@ import { ReactComponent as PlusIcon } from 'static/iconmonstr-plus-lined.svg'
 
 import styles from './styles.scss'
 
-function SizeControl({ position, onResize, onCreate }) {
+function SizeControl({ position, onLeave, onResize, onCreate, onDelete }) {
   // we don't need to re-render for any of these values
   const hasClickPending = useRef(false)
 
@@ -52,6 +52,7 @@ function SizeControl({ position, onResize, onCreate }) {
       )}
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
+      onMouseLeave={onLeave}
       draggable={false}
     >
       <button
