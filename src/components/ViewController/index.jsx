@@ -1,6 +1,6 @@
 // TODO: Clean this file
 
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
 import _find from 'lodash/find'
@@ -83,7 +83,7 @@ function ViewController({
     setDragAction(null)
   }
 
-  const requestResize = ({ id, direction, origin }) => {
+  const resizeView = useCallback(({ id, direction, origin }) => {
     const isResizeVertical = (direction === DIRECTION.top || direction === DIRECTION.bottom)
     const isResizeBeforeView = (direction === DIRECTION.top || direction === DIRECTION.left)
 
@@ -105,9 +105,14 @@ function ViewController({
     } else {
       setDragAction({ id, origin, direction })
     }
-  }
+  }, [
+    views,
+    isVertical,
+    controllerId,
+    requestResize,
+  ])
 
-  const insertView = ({ id, direction }) => {
+  const insertView = useCallback(({ id, direction }) => {
     const isActionVertical = (direction === DIRECTION.top || direction === DIRECTION.bottom)
     const isInsertionBeforeView = (direction === DIRECTION.top || direction === DIRECTION.left)
 
@@ -175,7 +180,10 @@ function ViewController({
         ...views.slice(viewIndex + 1)
       ])
     }
-  }
+  }, [
+    views,
+    isVertical,
+  ])
 
   // Note that this listener is conditionally applied, see component return value below
   const onMouseMove = ({ clientX, clientY }) => {

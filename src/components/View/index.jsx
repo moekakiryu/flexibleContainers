@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useCallback } from 'react'
 // import PropTypes from 'prop-types'
 
 import { DIRECTION } from 'shared/utils/constants'
@@ -9,13 +9,13 @@ import styles from './styles.scss'
 const HOVER_DELAY = 350 // ms
 
 function View({
+  viewId,
   width,
   height,
   neighbors,
   isDragged,
   requestResize,
   requestInsertion,
-  viewId,
   component,
   ...otherProps
 }) {
@@ -58,7 +58,7 @@ function View({
     controlHoverTimeout.current = null
   }
 
-  const resizeView = ({ mouseX, mouseY, direction }) => {
+  const resizeView = useCallback(({ mouseX, mouseY, direction }) => {
     if (!isDragged && activeControl) {
       requestResize({
         id: viewId,
@@ -66,11 +66,19 @@ function View({
         origin: { x: mouseX, y: mouseY }
       })
     }
-  }
+  }, [
+    activeControl,
+    viewId,
+    isDragged,
+    requestResize,
+  ])
 
-  const createView = ({ direction }) => {
+  const createView = useCallback(({ direction }) => {
     requestInsertion({ id: viewId, direction })
-  }
+  }, [
+    viewId,
+    requestInsertion,
+  ])
 
   const onMouseMove = ({ clientX, clientY }) => {
     const controlRegions = getControlRegions(containerRef.current, clientX, clientY)
