@@ -79,6 +79,16 @@ function ViewController({
     isVertical
   ])
 
+  const createContainedView = (replaceView, children = []) => {
+    return {
+      id: getRandomId(),
+      width: replaceView.width,
+      height: replaceView.height,
+      neighbors: { ...replaceView.neighbors },
+      children: children.length > 0 ? children : [ replaceView ]
+    }
+  }
+
   const clearResize = () => {
     setDragAction(null)
   }
@@ -114,7 +124,7 @@ function ViewController({
 
   const insertView = useCallback(({ id, direction }) => {
     const isActionVertical = (direction === DIRECTION.top || direction === DIRECTION.bottom)
-    const isInsertionBeforeView = (direction === DIRECTION.top || direction === DIRECTION.left)
+    const isActionAligned = isVertical === isActionVertical
 
     const activeView = _find(views, { id })
     const viewIndex = views.indexOf(activeView)
@@ -127,59 +137,41 @@ function ViewController({
       null
     )
 
+    // The new view should take up half of the old views space
+    const newDimensions = {
+      width: isActionVertical ? 1 : activeView.width / 2,
+      height: isActionVertical ? activeView.height / 2 : 1
+    }
+
+    // The new view will displace the active view
+    // eg direction = down --> new view will be in bottom half of old space,
+    //    pushing the active view up, M=meaning the opposite neighbor is
+    //    guarunteed
     const newView = {
       id: getRandomId(),
-      // The new view should take up half of the old views space
-      width: isActionVertical ? 1 : activeView.width / 2,
-      height: isActionVertical ? activeView.height / 2 : 1,
-      // The new view will displace the active view
-      // eg direction = down --> new view will be in bottom half of old space,
-      //    pushing the active view up, M=meaning the opposite neighbor is
-      //    guarunteed
+      ...newDimensions,
       neighbors: {
         ...activeView.neighbors,
         [oppositeDirection]: true
       }
     }
 
-    const newContainer = {
-      id: getRandomId(),
-      width: activeView.width,
-      height: activeView.height,
-      neighbors: { ...activeView.neighbors },
-      children: isInsertionBeforeView ? [ newView, activeView ] : [ activeView, newView ]
-    }
+    const children = (direction === DIRECTION.top || direction === DIRECTION.left)
+      ? [ newView, activeView ]
+      : [ activeView, newView ]
 
-    // Halve the size of the long axis to make room for the newly inserted view
-    if (isActionVertical) {
-      activeView.height /= 2
-    } else {
-      activeView.width /= 2
-    }
+    const intertedObjects = isActionAligned
+      ? children
+      : [ createContainedView(activeView, children) ]
 
-    if (isVertical === isActionVertical) {
-      setViews([
-        ...views.slice(0, viewIndex),
-        ...isInsertionBeforeView ? [ newView, activeView ] : [ activeView, newView ],
-        ...views.slice(viewIndex + 1)
-      ])
-    } else {
-      // Since we are swapping orientations, reset new short axis to 100% of
-      // container size
-      if (isActionVertical) {
-        activeView.width = 1
-      } else {
-        activeView.height = 1
-      }
+    activeView.width = newDimensions.width
+    activeView.height = newDimensions.height
 
-      // Add in the new container, and also remove the old activeView, which
-      // is now a child of said container
-      setViews([
-        ...views.slice(0, viewIndex),
-        newContainer,
-        ...views.slice(viewIndex + 1)
-      ])
-    }
+    setViews([
+      ...views.slice(0, viewIndex),
+      ...intertedObjects,
+      ...views.slice(viewIndex + 1)
+    ])
   }, [
     views,
     isVertical,
