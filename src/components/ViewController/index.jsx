@@ -42,42 +42,52 @@ function ViewController({
   useEffect(() => {
     const { children } = layout
 
-    const totalWidth = children.reduce((total, child) => total + child.width, 0)
-    const totalHeight = children.reduce((total, child) => total + child.height, 0)
-
     // Sanitize and process layout from props
-    setViews(children.map((child, childIdx) => {
-      const hasPrev = !!children[childIdx - 1]
-      const hasNext = !!children[childIdx + 1]
+    setViews(
+      normalizeDimensions(children)
+      .map((child, childIdx) => {
+        const hasPrev = !!children[childIdx - 1]
+        const hasNext = !!children[childIdx + 1]
 
-      // Calculate adjacent elements to assist with rendering size controls
-      const childNeighbors = isVertical ? {
-        ...neighbors,
-        [DIRECTION.top]: hasPrev || neighbors[DIRECTION.top],
-        [DIRECTION.bottom]: hasNext || neighbors[DIRECTION.bottom],
-      } : {
-        ...neighbors,
-        [DIRECTION.left]: hasPrev || neighbors[DIRECTION.left],
-        [DIRECTION.right]: hasNext || neighbors[DIRECTION.right],
-      }
+        // Calculate adjacent elements to assist with rendering size controls
+        const childNeighbors = isVertical ? {
+          ...neighbors,
+          [DIRECTION.top]: hasPrev || neighbors[DIRECTION.top],
+          [DIRECTION.bottom]: hasNext || neighbors[DIRECTION.bottom],
+        } : {
+          ...neighbors,
+          [DIRECTION.left]: hasPrev || neighbors[DIRECTION.left],
+          [DIRECTION.right]: hasNext || neighbors[DIRECTION.right],
+        }
 
-      // Normalize the values in the long axis in case they sum to grater than 100%
-      const childWidth = !isVertical ? ( child.width / totalWidth ) : child.width
-      const childHeight = isVertical ? ( child.height / totalHeight ) : child.height
-
-      return {
-        ...child,
-        width: childWidth,
-        height: childHeight,
-        neighbors: childNeighbors,
-      }
-    }))
+        return {
+          ...child,
+          neighbors: childNeighbors,
+        }
+      })
+    )
   // Note that all of these props are expected to change very infrequently
   }, [
     layout,
     neighbors,
     isVertical
   ])
+
+  const normalizeDimensions = (views) => {
+    const totalWidth = views.reduce((total, view) => total + view.width, 0)
+    const totalHeight = views.reduce((total, view) => total + view.height, 0)
+
+    return views.map((view) => {
+      const viewWidth = !isVertical ? ( view.width / totalWidth ) : view.width
+      const viewHeight = isVertical ? ( view.height / totalHeight ) : view.height
+
+      return {
+        ...view,
+        width: viewWidth,
+        height: viewHeight,
+      }
+    })
+  }
 
   const createContainedView = (replaceView, children = []) => {
     return {
@@ -94,8 +104,8 @@ function ViewController({
   }
 
   const resizeView = useCallback(({ id, direction, origin }) => {
-    const isResizeVertical = (direction === DIRECTION.top || direction === DIRECTION.bottom)
-    const isResizeBeforeView = (direction === DIRECTION.top || direction === DIRECTION.left)
+    const isActionVertical = (direction === DIRECTION.top || direction === DIRECTION.bottom)
+    const isActionBeforeView = (direction === DIRECTION.top || direction === DIRECTION.left)
 
     const isFirstChild = views?.[0].id === id
     const isLastChild = views?.[views.length - 1].id === id
@@ -104,12 +114,12 @@ function ViewController({
     // the flex direction. If the resize request is for the short axis, then
     // forward the request to the parent container so that the pattern is
     // maintained.
-    if (isVertical !== isResizeVertical) {
+    if (isVertical !== isActionVertical) {
       requestResize({ id: controllerId, direction, origin})
     // If we are trying to resize in a direction that isn't possible
     // (eg left for the first child), pass thre resize request to the parent to
     // handle.
-    } else if ((isFirstChild && isResizeBeforeView) || (isLastChild && !isResizeBeforeView)) {
+    } else if ((isFirstChild && isActionBeforeView) || (isLastChild && !isActionBeforeView)) {
       requestResize({ id: controllerId, direction, origin })
     // Otherwise handle the request normally
     } else {
