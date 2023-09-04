@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react'
-// import PropTypes from 'prop-types'
+import PropTypes from 'prop-types'
+import _noop from 'lodash/noop'
 
 import { DIRECTION } from 'shared/utils/constants'
 import SizeControl from 'components/SizeControl'
@@ -127,7 +128,6 @@ function View({
       draggable={!activeControl}
       onMouseMove={onMouseMove}
       onMouseLeave={onMouseLeave}
-      {...otherProps}
     >
       <SizeControl
         position={activeControl}
@@ -137,6 +137,25 @@ function View({
       <div className={styles.content}>{component}</div>
     </div>
   )
+}
+
+View.propTypes = {
+  viewId: PropTypes.string.isRequired,
+  width: PropTypes.number.isRequired,
+  height: PropTypes.number.isRequired,
+  neighbors: PropTypes.shape({}),
+  isDragged: PropTypes.bool,
+  requestResize: PropTypes.func,
+  requestInsertion: PropTypes.func,
+  component: PropTypes.elementType,
+}
+
+View.defaultProps = {
+  neighbors: [],
+  isDragged: false,
+  requestResize: _noop,
+  requestInsertion: _noop,
+  component: null,
 }
 
 export default View;
