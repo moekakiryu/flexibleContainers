@@ -14,6 +14,18 @@ import styles from './styles.scss'
 // TODO: Replace this with UUID or similar
 const getRandomId = () => `${Math.floor(Math.random() * 1e12)}`
 
+const getDirectionDetails = (direction) => ({
+  isVertical: direction === DIRECTION.top || direction === DIRECTION.bottom,
+  isNegative: direction === DIRECTION.top || direction === DIRECTION.left,
+  complement: (
+    direction === DIRECTION.top ? DIRECTION.bottom :
+    direction === DIRECTION.bottom ? DIRECTION.top :
+    direction === DIRECTION.left ? DIRECTION.right :
+    direction === DIRECTION.right ? DIRECTION.left :
+    null
+  ),
+})
+
 /*
  * View => {
  *   id: str,
@@ -96,22 +108,22 @@ function ViewController({
 
   // TODO: Optimize these callbacks using a method like: https://medium.com/@0utoftime/using-reacts-usecallback-hook-to-preserve-identity-of-partially-applied-callbacks-in-collections-3dbac35371ea
   const getResizeInitiator = id => ({ direction, origin }) => {
-    const isActionVertical = (direction === DIRECTION.top || direction === DIRECTION.bottom)
-    const isActionBeforeView = (direction === DIRECTION.top || direction === DIRECTION.left)
+    const {
+      isVertical:isDirectionVertical,
+      isNegative: isDirectionNegative,
+    } = getDirectionDetails(direction)
 
     const isFirstChild = views?.[0].id === id
     const isLastChild = views?.[views.length - 1].id === id
 
-    // Resizing should always be done for the long axis so that it aligns with
-    // the flex direction. If the resize request is for the short axis, then
-    // forward the request to the parent container so that the pattern is
-    // maintained.
-    if (isVertical !== isActionVertical) {
+    // Resizing should always be done so that it aligns with the flex direction.
+    // If the resize request is for the cross axis, then forward the request to
+    // the parent container
+    if (isVertical !== isDirectionVertical) {
       requestResize({ direction, origin })
     // If we are trying to resize in a direction that isn't possible
-    // (eg left for the first child), pass thre resize request to the parent to
-    // handle.
-    } else if ((isFirstChild && isActionBeforeView) || (isLastChild && !isActionBeforeView)) {
+    // (eg left for the first child), forward the resize request to the parent
+    } else if ((isFirstChild && isDirectionNegative) || (isLastChild && !isDirectionNegative)) {
       requestResize({ direction, origin })
     // Otherwise handle the request normally
     } else {
@@ -120,53 +132,45 @@ function ViewController({
   }
 
   const getInsertInitiator = id => ({ direction }) => {
-    const isActionVertical = (direction === DIRECTION.top || direction === DIRECTION.bottom)
-    const isActionAligned = isVertical === isActionVertical
+    const {
+      isVertical: isDirectionVertical,
+      isNegative: isDirectionNegative,
+      complement: complementDirection
+    } = getDirectionDetails(direction)
 
     const activeView = _find(views, { id })
     const viewIndex = views.indexOf(activeView)
 
-    const oppositeDirection = (
-      direction === DIRECTION.top ? DIRECTION.bottom :
-      direction === DIRECTION.bottom ? DIRECTION.top :
-      direction === DIRECTION.left ? DIRECTION.right :
-      direction === DIRECTION.right ? DIRECTION.left :
-      null
-    )
-
     // The new view should take up half of the old views space
-    const newDimensions = {
-      width: isActionVertical ? 1 : activeView.width / 2,
-      height: isActionVertical ? activeView.height / 2 : 1
-    }
+    const newWidth = isDirectionVertical ? 1 : activeView.width / 2
+    const newHeight = isDirectionVertical ? activeView.height / 2 : 1
 
     // The new view will displace the active view
     // eg direction = down --> new view will be in bottom half of old space,
-    //    pushing the active view up, M=meaning the opposite neighbor is
+    //    pushing the active view up, meaning the opposite neighbor is
     //    guarunteed
     const newView = {
       id: getRandomId(),
-      ...newDimensions,
+      width: newWidth,
+      height: newHeight,
       neighbors: {
         ...activeView.neighbors,
-        [oppositeDirection]: true
+        [complementDirection]: true
       }
     }
 
-    const children = (direction === DIRECTION.top || direction === DIRECTION.left)
-      ? [ newView, activeView ]
-      : [ activeView, newView ]
+    const children = isDirectionNegative ? [ newView, activeView ] : [ activeView, newView ]
 
-    const intertedObjects = isActionAligned
+    const insertedObjects = (isVertical === isDirectionVertical)
       ? children
       : [ createContainedView(activeView, children) ]
 
-    activeView.width = newDimensions.width
-    activeView.height = newDimensions.height
+    activeView.width = newWidth
+    activeView.height = newHeight
 
     setViews([
       ...views.slice(0, viewIndex),
-      ...intertedObjects,
+      ...insertedObjects,
       ...views.slice(viewIndex + 1)
     ])
   }
