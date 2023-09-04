@@ -42,10 +42,11 @@ function ViewController({
   useEffect(() => {
     const { children } = layout
 
+    const totalWidth = children.reduce((total, view) => total + view.width, 0)
+    const totalHeight = children.reduce((total, view) => total + view.height, 0)
+
     // Sanitize and process layout from props
-    setViews(
-      normalizeDimensions(children)
-      .map((child, childIdx) => {
+    setViews(children.map((child, childIdx) => {
         const hasPrev = !!children[childIdx - 1]
         const hasNext = !!children[childIdx + 1]
 
@@ -60,9 +61,15 @@ function ViewController({
           [DIRECTION.right]: hasNext || neighbors[DIRECTION.right],
         }
 
+        // Normalize view dimensions (if they sum to a value other than 1)
+        const viewWidth = !isVertical ? ( child.width / totalWidth ) : child.width
+        const viewHeight = isVertical ? ( child.height / totalHeight ) : child.height
+
         return {
           ...child,
           neighbors: childNeighbors,
+          width: viewWidth,
+          height: viewHeight,
         }
       })
     )
@@ -70,24 +77,8 @@ function ViewController({
   }, [
     layout,
     neighbors,
-    isVertical
+    isVertical,
   ])
-
-  const normalizeDimensions = (views) => {
-    const totalWidth = views.reduce((total, view) => total + view.width, 0)
-    const totalHeight = views.reduce((total, view) => total + view.height, 0)
-
-    return views.map((view) => {
-      const viewWidth = !isVertical ? ( view.width / totalWidth ) : view.width
-      const viewHeight = isVertical ? ( view.height / totalHeight ) : view.height
-
-      return {
-        ...view,
-        width: viewWidth,
-        height: viewHeight,
-      }
-    })
-  }
 
   const createContainedView = (replaceView, children = []) => {
     return {
