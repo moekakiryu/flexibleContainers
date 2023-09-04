@@ -7,24 +7,13 @@ import _find from 'lodash/find'
 import _noop from 'lodash/noop'
 
 import { DIRECTION } from 'shared/utils/constants'
+import { getDirectionDetails } from 'shared/utils/directions'
 import View from 'components/View'
 
 import styles from './styles.scss'
 
 // TODO: Replace this with UUID or similar
 const getRandomId = () => `${Math.floor(Math.random() * 1e12)}`
-
-const getDirectionDetails = (direction) => ({
-  isVertical: direction === DIRECTION.top || direction === DIRECTION.bottom,
-  isNegative: direction === DIRECTION.top || direction === DIRECTION.left,
-  complement: (
-    direction === DIRECTION.top ? DIRECTION.bottom :
-    direction === DIRECTION.bottom ? DIRECTION.top :
-    direction === DIRECTION.left ? DIRECTION.right :
-    direction === DIRECTION.right ? DIRECTION.left :
-    null
-  ),
-})
 
 /*
  * View => {
