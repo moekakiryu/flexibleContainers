@@ -1,6 +1,6 @@
 // TODO: Clean this file
 
-import React, { useEffect, useState, useRef, useCallback } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
 import _find from 'lodash/find'
@@ -94,7 +94,8 @@ function ViewController({
     setDragAction(null)
   }
 
-  const resizeView = useCallback(({ id, direction, origin }) => {
+  // TODO: Optimize these callbacks using a method like: https://medium.com/@0utoftime/using-reacts-usecallback-hook-to-preserve-identity-of-partially-applied-callbacks-in-collections-3dbac35371ea
+  const getResizeInitiator = id => ({ direction, origin }) => {
     const isActionVertical = (direction === DIRECTION.top || direction === DIRECTION.bottom)
     const isActionBeforeView = (direction === DIRECTION.top || direction === DIRECTION.left)
 
@@ -106,24 +107,19 @@ function ViewController({
     // forward the request to the parent container so that the pattern is
     // maintained.
     if (isVertical !== isActionVertical) {
-      requestResize({ id: controllerId, direction, origin})
+      requestResize({ direction, origin })
     // If we are trying to resize in a direction that isn't possible
     // (eg left for the first child), pass thre resize request to the parent to
     // handle.
     } else if ((isFirstChild && isActionBeforeView) || (isLastChild && !isActionBeforeView)) {
-      requestResize({ id: controllerId, direction, origin })
+      requestResize({ direction, origin })
     // Otherwise handle the request normally
     } else {
       setDragAction({ id, origin, direction })
     }
-  }, [
-    views,
-    isVertical,
-    controllerId,
-    requestResize,
-  ])
+  }
 
-  const insertView = useCallback(({ id, direction }) => {
+  const getInsertInitiator = id => ({ direction }) => {
     const isActionVertical = (direction === DIRECTION.top || direction === DIRECTION.bottom)
     const isActionAligned = isVertical === isActionVertical
 
@@ -173,10 +169,7 @@ function ViewController({
       ...intertedObjects,
       ...views.slice(viewIndex + 1)
     ])
-  }, [
-    views,
-    isVertical,
-  ])
+  }
 
   // Note that this listener is conditionally applied, see component return value below
   const onMouseMove = ({ clientX, clientY }) => {
@@ -253,9 +246,9 @@ function ViewController({
 
           controllerId={view.id}
           neighbors={view.neighbors}
-          requestResize={resizeView}
           isDragged={!!dragAction || isDragged}
           isVertical={!isVertical}
+          requestResize={getResizeInitiator(view.id)}
         />
       )
     }
@@ -269,8 +262,8 @@ function ViewController({
         viewId={view.id}
         neighbors={view.neighbors}
         isDragged={!!dragAction || isDragged}
-        requestResize={resizeView}
-        requestInsertion={insertView}
+        requestResize={getResizeInitiator(view.id)}
+        requestInsertion={getInsertInitiator(view.id)}
       />
     )
   })

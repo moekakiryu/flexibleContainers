@@ -69,23 +69,20 @@ function View({
   const resizeView = useCallback(({ mouseX, mouseY, direction }) => {
     if (!isDragged && activeControl) {
       requestResize({
-        id: viewId,
         direction,
         origin: { x: mouseX, y: mouseY }
       })
     }
   }, [
     activeControl,
-    viewId,
     isDragged,
     requestResize,
   ])
 
   const createView = useCallback(({ direction }) => {
-    requestInsertion({ id: viewId, direction })
     setActiveControl(null)
+    requestInsertion({ direction })
   }, [
-    viewId,
     requestInsertion,
   ])
 
