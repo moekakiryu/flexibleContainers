@@ -6,8 +6,7 @@ import cx from 'classnames'
 import _find from 'lodash/find'
 import _noop from 'lodash/noop'
 
-import { DIRECTION } from 'shared/utils/constants'
-import { getDirectionDetails } from 'shared/utils/directions'
+import { DIRECTION, getDirectionDetails } from 'shared/utils'
 import View from 'components/View'
 
 import styles from './styles.scss'

@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import cx from "classnames";
 
-import { DIRECTION } from "shared/utils/constants";
+import { DIRECTION } from "shared/utils";
 import { ReactComponent as PlusIcon } from 'static/iconmonstr-plus-lined.svg'
 
 import styles from './styles.scss'
