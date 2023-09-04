@@ -73,8 +73,8 @@ function ViewController({
         }
       })
     )
-  // Note that all of these props are expected to change very infrequently
   }, [
+    // Note that all of these props are expected to change very infrequently
     layout,
     neighbors,
     isVertical,
@@ -133,14 +133,14 @@ function ViewController({
     const newWidth = isDirectionVertical ? 1 : activeView.width / 2
     const newHeight = isDirectionVertical ? activeView.height / 2 : 1
 
-    // The new view will displace the active view
-    // eg direction = down --> new view will be in bottom half of old space,
-    //    pushing the active view up, meaning the opposite neighbor is
-    //    guarunteed
     const newView = {
       id: getRandomId(),
       width: newWidth,
       height: newHeight,
+      // The new view will displace the active view
+      // eg direction = down --> new view will be in bottom half of old space,
+      //    pushing the active view up, meaning the opposite neighbor is
+      //    guarunteed
       neighbors: {
         ...activeView.neighbors,
         [complementDirection]: true
