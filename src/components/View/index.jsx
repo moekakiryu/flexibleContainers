@@ -6,7 +6,7 @@ import SizeControl from 'components/SizeControl'
 
 import styles from './styles.scss'
 
-const HOVER_DELAY = 350 // ms
+const HOVER_DELAY = 100 // ms
 
 function View({
   viewId,
@@ -25,7 +25,7 @@ function View({
   const [ activeControl, setActiveControl ] = useState(null)
 
   // TODO: This should not be percentage based (small view = tiny region size)
-  const getControlRegions = (container, mouseX, mouseY, options = { enterRegion: 25, exitRegion: 60 }) => {
+  const getControlRegions = (container, mouseX, mouseY, options = { enterRegion: 15, exitRegion: 60 }) => {
     const mouseOffset = {
       x: (mouseX - container.offsetLeft),
       y: (mouseY - container.offsetTop),
