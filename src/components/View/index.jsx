@@ -66,12 +66,6 @@ function View({
     controlHoverTimeout.current = null
   }
 
-  const clearActiveControl = () => {
-    if (!isDragged) {
-      setActiveControl(null)
-    }
-  }
-
   const resizeView = useCallback(({ mouseX, mouseY, direction }) => {
     if (!isDragged && activeControl) {
       requestResize({
@@ -89,6 +83,7 @@ function View({
 
   const createView = useCallback(({ direction }) => {
     requestInsertion({ id: viewId, direction })
+    setActiveControl(null)
   }, [
     viewId,
     requestInsertion,
@@ -104,16 +99,19 @@ function View({
       if (newActiveControl != null) {
         waitForControlHover(newActiveControl)
       } else {
-        clearActiveControl()
+        setActiveControl(null)
       }
     } else if (newActiveControl === null && controlHoverTimeout.current != null) {
+      // If the user hovers over a control, then moves away before `activeControl` is set
       clearControlHover()
     }
   }
 
   const onMouseLeave = () => {
     clearControlHover()
-    clearActiveControl()
+    if (!isDragged) {
+      setActiveControl(null)
+    }
   }
 
   // TODO: Otherprops should be passed to the viewed component
