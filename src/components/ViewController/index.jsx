@@ -91,10 +91,6 @@ function ViewController({
     }
   }
 
-  const clearResize = () => {
-    setDragAction(null)
-  }
-
   // TODO: Optimize these callbacks using a method like: https://medium.com/@0utoftime/using-reacts-usecallback-hook-to-preserve-identity-of-partially-applied-callbacks-in-collections-3dbac35371ea
   const getResizeInitiator = id => ({ direction, origin }) => {
     const {
@@ -265,11 +261,11 @@ function ViewController({
   }
 
   const onMouseUp = () => {
-    clearResize()
+    setDragAction(null)
   }
 
   const onMouseLeave = () => {
-    clearResize()
+    setDragAction(null)
   }
 
   const childViewContent = views?.map(view => {
