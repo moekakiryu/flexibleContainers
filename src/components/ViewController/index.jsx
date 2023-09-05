@@ -95,8 +95,8 @@ function ViewController({
       isNegative: isDirectionNegative,
     } = getDirectionDetails(direction)
 
-    const isFirstChild = views?.[0].id === id
-    const isLastChild = views?.[views.length - 1].id === id
+    const isFirstChild = views[0].id === id
+    const isLastChild = views[views.length - 1].id === id
 
     // Resizing should always be done so that it aligns with the flex direction.
     // If the resize request is for the cross axis, then forward the request to
