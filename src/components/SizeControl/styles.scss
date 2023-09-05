@@ -3,7 +3,7 @@
 
 $control-span: 100%;
 $margin-size: .4rem;
-$icon-diameter: 4rem;
+$icon-diameter: 3.4rem;
 
 // 1. Size controls (same for horizontal/vertical positions)
 //    Also, place the element on the appropriate x/y axis
@@ -13,39 +13,32 @@ $icon-diameter: 4rem;
 
     position: absolute;
     display: flex;
-    align-items: center;
+    justify-content: center;
 
     background-color: rgba(#000, 10%);
     height: 2rem;
     width: 2rem;
 
-    animation: fadein .25s;
 
     // [1]
     &.top,
     &.bottom {
-        flex-direction: column;
-        width: 100%;
+        flex-direction: row;
 
-        left: 50%;
+        left: $margin-size;
         width: calc( $control-span - 2 * $margin-size );
         margin: $margin-size 0;
-
-        transform: translateX(-50%);
 
         cursor: row-resize;
     }
 
     &.left,
     &.right {
-        flex-direction: row;
-        height: 100%;
+        flex-direction: column;
 
-        top: 50%;
+        top: $margin-size;
         height: calc( $control-span - 2 * $margin-size );
         margin: 0 $margin-size;
-
-        transform: translateY(-50%);
 
         cursor: col-resize;
     }
@@ -53,18 +46,22 @@ $icon-diameter: 4rem;
     // [2]
     &.top {
         top: 0;
+        align-items: flex-start;
     }
 
     &.bottom {
         bottom: 0;
+        align-items: flex-end;
     }
 
     &.left {
         left: 0;
+        align-items: flex-start;
     }
 
     &.right {
         right: 0;
+        align-items: flex-end;
     }
 }
 
@@ -75,33 +72,32 @@ $icon-diameter: 4rem;
 
     z-index: 1;
 
-    position: absolute;
+    position: relative;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    place-content: center center;
 
     height: $icon-diameter;
     width: $icon-diameter;
 
     background-color: white;
-    border: $margin-size solid white;
+    margin: $margin-size;
 
     cursor: pointer;
 
     .top & {
-        top: .4rem;
+        top: $margin-size;
     }
 
     .bottom & {
-        bottom: .4rem;
+        bottom: $margin-size;
     }
 
     .right & {
-        right: .4rem;
+        right: $margin-size;
     }
 
     .left & {
-        left: .4rem;
+        left: $margin-size;
     }
 
     &:hover,

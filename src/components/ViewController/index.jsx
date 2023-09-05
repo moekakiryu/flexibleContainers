@@ -33,6 +33,7 @@ function ViewController({
   isVertical,
   isDragged,
   requestResize,
+  requestDeletion,
 }) {
   const containerRef = useRef()
 
@@ -163,6 +164,50 @@ function ViewController({
     ])
   }
 
+  // TODO: Make this a callback
+  const getDeleteInitiator = id => ({ direction, preserveViews = [] }) => {
+    const {
+      isNegative: isDirectionNegative,
+    } = getDirectionDetails(direction)
+
+    const activeView = _find(views, { id })
+    const viewIndex = views.indexOf(activeView)
+
+    const prevView = views[viewIndex - 1]
+    const nextView = views[viewIndex + 1]
+
+    // The adjacent view (if any) should expand to fill the empty space left by
+    // the deleted view
+    if (preserveViews.length === 0) {
+      // Fallbacks are in case activeView is the first or last child
+      const resizedView = isDirectionNegative ? (prevView || nextView) : (nextView || prevView)
+
+      if (isVertical) {
+        resizedView.height += activeView.height
+      } else {
+        resizedView.width += activeView.width
+      }
+    }
+
+    const newViews = [
+      ...views.slice(0, viewIndex),
+      ...preserveViews,
+      ...views.slice(viewIndex + 1)
+    ]
+
+    if (newViews.length <= 1) {
+      // There will only be at most one element in this array
+      newViews.forEach(view => {
+        view.width = width
+        view.height = height
+        view.neighbors = neighbors
+      })
+      requestDeletion({ direction, preserveViews: newViews })
+    }
+
+    setViews(newViews)
+  }
+
   // Note that this listener is conditionally applied, see component return value below
   const onMouseMove = ({ clientX, clientY }) => {
     const { id, origin, direction } = dragAction
@@ -241,6 +286,7 @@ function ViewController({
           isDragged={!!dragAction || isDragged}
           isVertical={!isVertical}
           requestResize={getResizeInitiator(view.id)}
+          requestDeletion={getDeleteInitiator(view.id)}
         />
       )
     }
@@ -256,6 +302,7 @@ function ViewController({
         isDragged={!!dragAction || isDragged}
         requestResize={getResizeInitiator(view.id)}
         requestInsertion={getInsertInitiator(view.id)}
+        requestDeletion={getDeleteInitiator(view.id)}
       />
     )
   })
@@ -286,6 +333,7 @@ ViewController.propTypes = {
   height: PropTypes.number,
   neighbors: PropTypes.shape({}),
   requestResize: PropTypes.func,
+  requestDeletion: PropTypes.func,
   isDragged: PropTypes.bool,
   isVertical: PropTypes.bool,
 }
@@ -295,6 +343,7 @@ ViewController.defaultProps = {
   height: 1,
   neighbors: {},
   requestResize: _noop,
+  requestDeletion: _noop,
   isDragged: false,
   isVertical: false,
 }

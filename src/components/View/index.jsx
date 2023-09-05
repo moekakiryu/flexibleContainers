@@ -17,6 +17,7 @@ function View({
   isDragged,
   requestResize,
   requestInsertion,
+  requestDeletion,
   component,
   ...otherProps
 }) {
@@ -86,6 +87,12 @@ function View({
     requestInsertion,
   ])
 
+  const deleteView = useCallback(() => {
+    requestDeletion({ direction: activeControl })
+  }, [
+    requestDeletion,
+  ])
+
   const onMouseMove = ({ clientX, clientY }) => {
     const controlRegions = getControlRegions(containerRef.current, clientX, clientY)
     const newActiveControl = filterControlRegions(controlRegions)
@@ -128,6 +135,7 @@ function View({
         position={activeControl}
         onCreate={createView}
         onResize={resizeView}
+        onDelete={deleteView}
       />
       <div className={styles.content}>{component}</div>
     </div>
@@ -142,6 +150,7 @@ View.propTypes = {
   isDragged: PropTypes.bool,
   requestResize: PropTypes.func,
   requestInsertion: PropTypes.func,
+  requestDeletion: PropTypes.func,
   component: PropTypes.elementType,
 }
 
@@ -150,7 +159,8 @@ View.defaultProps = {
   isDragged: false,
   requestResize: _noop,
   requestInsertion: _noop,
+  requestDeletion: _noop,
   component: null,
 }
 
-export default View;
+export default View

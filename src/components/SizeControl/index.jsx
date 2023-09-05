@@ -1,8 +1,11 @@
 import React, { useRef } from "react";
+import PropTypes from 'prop-types'
 import cx from "classnames";
+import _noop from 'lodash/noop'
 
 import { DIRECTION } from "shared/utils";
 import { ReactComponent as PlusIcon } from 'static/iconmonstr-plus-lined.svg'
+import { ReactComponent as CrossIcon } from 'static/iconmonstr-x-mark-lined.svg'
 
 import styles from './styles.scss'
 
@@ -25,9 +28,18 @@ function SizeControl({ position, onLeave, onResize, onCreate, onDelete }) {
     }
   }
 
-  const onButtonClick = ({ clientX, clientY }) => {
+  const onCreateButtonClick = ({ clientX, clientY }) => {
     if (hasClickPending.current) {
       onCreate({
+        mouseX: clientX,
+        mouseY: clientY,
+      })
+    }
+  }
+
+  const onDeleteButtonClick = ({ clientX, clientY} ) => {
+    if (hasClickPending.current) {
+      onDelete({
         mouseX: clientX,
         mouseY: clientY,
       })
@@ -56,10 +68,18 @@ function SizeControl({ position, onLeave, onResize, onCreate, onDelete }) {
       <button
         type="button"
         className={styles.addButton}
-        onClick={onButtonClick}
+        onClick={onCreateButtonClick}
       >
         <PlusIcon />
       </button>
+      <button
+        type="button"
+        className={styles.addButton}
+        onClick={onDeleteButtonClick}
+      >
+        <CrossIcon style={{fill: 'red'}} />
+      </button>
+
     </span>
   )
 
@@ -69,5 +89,22 @@ function SizeControl({ position, onLeave, onResize, onCreate, onDelete }) {
     </React.Fragment>
   )
 }
+
+SizeControl.propTypes = {
+  position: PropTypes.string,
+  onLeave: PropTypes.func,
+  onResize: PropTypes.func,
+  onCreate: PropTypes.func,
+  onDelete: PropTypes.func,
+}
+
+SizeControl.defaultProps = {
+  position: null,
+  onLeave: _noop,
+  onResize: _noop,
+  onCreate: _noop,
+  onDelete: _noop,
+}
+
 
 export default SizeControl
