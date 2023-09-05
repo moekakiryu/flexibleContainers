@@ -85,7 +85,7 @@ function ViewController({
     width: replaceView.width,
     height: replaceView.height,
     neighbors: { ...replaceView.neighbors },
-    children: children.length > 0 ? children : [replaceView],
+    children,
   })
 
   // TODO: Optimize these callbacks using a method like: https://medium.com/@0utoftime/using-reacts-usecallback-hook-to-preserve-identity-of-partially-applied-callbacks-in-collections-3dbac35371ea
