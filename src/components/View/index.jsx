@@ -28,13 +28,13 @@ function View({
     container,
     mouseX,
     mouseY,
-    options = { enterRegion: 15, exitRegion: 60 },
+    options = { enterSize: 15, exitSize: 60 },
   ) => {
     const mouseOffset = {
       x: (mouseX - container.offsetLeft),
       y: (mouseY - container.offsetTop),
     }
-    const regionSize = activeControl ? options.exitRegion : options.enterRegion
+    const regionSize = activeControl ? options.exitSize : options.enterSize
 
     return [
       (mouseOffset.x < regionSize) && DIRECTION.left,
