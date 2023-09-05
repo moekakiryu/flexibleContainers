@@ -55,10 +55,7 @@ function SizeControl({
     }
   }
 
-  // Note: Below we could create a mapping from POSITION values to their
-  //       matching styles. While that would be more concise, this has the
-  //       benefit of being readable at a glance (unlike this comment)
-  const sizeControl = (
+  return !!position && (
     <span
       className={cx(
         styles.sizeControl,
@@ -88,13 +85,6 @@ function SizeControl({
       >
         <CrossIcon style={{ fill: 'red' }} />
       </button>
-
-    </span>
-  )
-
-  return (
-    <span>
-      {!!position && sizeControl}
     </span>
   )
 }
