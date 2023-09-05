@@ -188,7 +188,7 @@ function ViewController({
       ...views.slice(viewIndex + 1),
     ]
 
-    if (newViews.length <= 1) {
+    if (newViews.length <= 1 && !newViews[0]?.children?.length) {
       // There will only be at most one element in this array
       newViews.forEach((view, viewIdx) => {
         newViews[viewIdx].width = width
