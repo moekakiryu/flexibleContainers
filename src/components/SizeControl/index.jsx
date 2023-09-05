@@ -16,7 +16,6 @@ function SizeControl({ position, onLeave, onResize, onCreate, onDelete }) {
     onResize({
       mouseX: clientX,
       mouseY: clientY,
-      direction: position,
     })
   }
 
@@ -31,7 +30,6 @@ function SizeControl({ position, onLeave, onResize, onCreate, onDelete }) {
       onCreate({
         mouseX: clientX,
         mouseY: clientY,
-        direction: position,
       })
     }
   }

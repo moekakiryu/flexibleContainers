@@ -66,10 +66,10 @@ function View({
     controlHoverTimeout.current = null
   }
 
-  const resizeView = useCallback(({ mouseX, mouseY, direction }) => {
+  const resizeView = useCallback(({ mouseX, mouseY }) => {
     if (!isDragged && activeControl) {
       requestResize({
-        direction,
+        direction: activeControl,
         origin: { x: mouseX, y: mouseY }
       })
     }
@@ -79,9 +79,9 @@ function View({
     requestResize,
   ])
 
-  const createView = useCallback(({ direction }) => {
+  const createView = useCallback(() => {
     setActiveControl(null)
-    requestInsertion({ direction })
+    requestInsertion({ direction: activeControl })
   }, [
     requestInsertion,
   ])
