@@ -24,7 +24,6 @@ function View({
 
   const [activeControl, setActiveControl] = useState(null)
 
-  // TODO: This should not be percentage based (small view = tiny region size)
   const getControlRegions = (
     container,
     mouseX,
