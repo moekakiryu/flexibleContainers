@@ -98,10 +98,19 @@ const debugLayout = {
 
 function App() {
   return (
-    <ViewController
-      controllerId="root"
-      layout={defaultLayout}
-    />
+    <>
+      <style>
+        {`
+          #root {
+            height: 100vh;
+          }
+        `}
+      </style>
+      <ViewController
+        controllerId="root"
+        layout={defaultLayout}
+      />
+    </>
   )
 }
 
