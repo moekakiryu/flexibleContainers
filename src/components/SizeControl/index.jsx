@@ -1,15 +1,24 @@
-import React, { useRef } from "react";
+// TODO: Add ARIA elements and <tab> support
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+
+import React, { useRef } from 'react'
 import PropTypes from 'prop-types'
-import cx from "classnames";
+import cx from 'classnames'
 import _noop from 'lodash/noop'
 
-import { DIRECTION } from "shared/utils";
+import { DIRECTION } from 'shared/utils'
 import { ReactComponent as PlusIcon } from 'static/iconmonstr-plus-lined.svg'
 import { ReactComponent as CrossIcon } from 'static/iconmonstr-x-mark-lined.svg'
 
 import styles from './styles.scss'
 
-function SizeControl({ position, onLeave, onResize, onCreate, onDelete }) {
+function SizeControl({
+  position,
+  onLeave,
+  onResize,
+  onCreate,
+  onDelete,
+}) {
   // we don't need to re-render for any of these values
   const hasClickPending = useRef(false)
 
@@ -37,7 +46,7 @@ function SizeControl({ position, onLeave, onResize, onCreate, onDelete }) {
     }
   }
 
-  const onDeleteButtonClick = ({ clientX, clientY} ) => {
+  const onDeleteButtonClick = ({ clientX, clientY }) => {
     if (hasClickPending.current) {
       onDelete({
         mouseX: clientX,
@@ -54,11 +63,11 @@ function SizeControl({ position, onLeave, onResize, onCreate, onDelete }) {
       className={cx(
         styles.sizeControl,
         {
-          [styles.top]:    position === DIRECTION.top,
+          [styles.top]: position === DIRECTION.top,
           [styles.bottom]: position === DIRECTION.bottom,
-          [styles.left]:   position === DIRECTION.left,
-          [styles.right]:  position === DIRECTION.right,
-        }
+          [styles.left]: position === DIRECTION.left,
+          [styles.right]: position === DIRECTION.right,
+        },
       )}
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
@@ -77,16 +86,16 @@ function SizeControl({ position, onLeave, onResize, onCreate, onDelete }) {
         className={styles.addButton}
         onClick={onDeleteButtonClick}
       >
-        <CrossIcon style={{fill: 'red'}} />
+        <CrossIcon style={{ fill: 'red' }} />
       </button>
 
     </span>
   )
 
   return (
-    <React.Fragment>
+    <span>
       {!!position && sizeControl}
-    </React.Fragment>
+    </span>
   )
 }
 
@@ -105,6 +114,5 @@ SizeControl.defaultProps = {
   onCreate: _noop,
   onDelete: _noop,
 }
-
 
 export default SizeControl

@@ -1,7 +1,7 @@
 export {
-    DIRECTION,
+  DIRECTION,
 } from './constants'
 
 export {
-    getDirectionDetails,
+  getDirectionDetails,
 } from './directions'

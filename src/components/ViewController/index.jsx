@@ -1,4 +1,5 @@
-// TODO: Clean this file
+// TODO: Add ARIA elements and <tab> support
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 
 import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
@@ -25,7 +26,6 @@ const getRandomId = () => `${Math.floor(Math.random() * 1e12)}`
  */
 
 function ViewController({
-  controllerId,
   width,
   height,
   layout,
@@ -37,8 +37,8 @@ function ViewController({
 }) {
   const containerRef = useRef()
 
-  const [ views, setViews ] = useState()
-  const [ dragAction, setDragAction ] = useState(null)
+  const [views, setViews] = useState()
+  const [dragAction, setDragAction] = useState(null)
 
   useEffect(() => {
     const { children } = layout
@@ -48,32 +48,31 @@ function ViewController({
 
     // Sanitize and process layout from props
     setViews(children.map((child, childIdx) => {
-        const hasPrev = !!children[childIdx - 1]
-        const hasNext = !!children[childIdx + 1]
+      const hasPrev = !!children[childIdx - 1]
+      const hasNext = !!children[childIdx + 1]
 
-        // Calculate adjacent elements to assist with rendering size controls
-        const childNeighbors = isVertical ? {
-          ...neighbors,
-          [DIRECTION.top]: hasPrev || neighbors[DIRECTION.top],
-          [DIRECTION.bottom]: hasNext || neighbors[DIRECTION.bottom],
-        } : {
-          ...neighbors,
-          [DIRECTION.left]: hasPrev || neighbors[DIRECTION.left],
-          [DIRECTION.right]: hasNext || neighbors[DIRECTION.right],
-        }
+      // Calculate adjacent elements to assist with rendering size controls
+      const childNeighbors = isVertical ? {
+        ...neighbors,
+        [DIRECTION.top]: hasPrev || neighbors[DIRECTION.top],
+        [DIRECTION.bottom]: hasNext || neighbors[DIRECTION.bottom],
+      } : {
+        ...neighbors,
+        [DIRECTION.left]: hasPrev || neighbors[DIRECTION.left],
+        [DIRECTION.right]: hasNext || neighbors[DIRECTION.right],
+      }
 
-        // Normalize view dimensions (if they sum to a value other than 1)
-        const viewWidth = !isVertical ? ( child.width / totalWidth ) : child.width
-        const viewHeight = isVertical ? ( child.height / totalHeight ) : child.height
+      // Normalize view dimensions (if they sum to a value other than 1)
+      const viewWidth = !isVertical ? (child.width / totalWidth) : child.width
+      const viewHeight = isVertical ? (child.height / totalHeight) : child.height
 
-        return {
-          ...child,
-          neighbors: childNeighbors,
-          width: viewWidth,
-          height: viewHeight,
-        }
-      })
-    )
+      return {
+        ...child,
+        neighbors: childNeighbors,
+        width: viewWidth,
+        height: viewHeight,
+      }
+    }))
   }, [
     // Note that all of these props are expected to change very infrequently
     layout,
@@ -81,20 +80,18 @@ function ViewController({
     isVertical,
   ])
 
-  const createContainedView = (replaceView, children = []) => {
-    return {
-      id: getRandomId(),
-      width: replaceView.width,
-      height: replaceView.height,
-      neighbors: { ...replaceView.neighbors },
-      children: children.length > 0 ? children : [ replaceView ]
-    }
-  }
+  const createContainedView = (replaceView, children = []) => ({
+    id: getRandomId(),
+    width: replaceView.width,
+    height: replaceView.height,
+    neighbors: { ...replaceView.neighbors },
+    children: children.length > 0 ? children : [replaceView],
+  })
 
   // TODO: Optimize these callbacks using a method like: https://medium.com/@0utoftime/using-reacts-usecallback-hook-to-preserve-identity-of-partially-applied-callbacks-in-collections-3dbac35371ea
-  const getResizeInitiator = id => ({ direction, origin }) => {
+  const getResizeInitiator = (id) => ({ direction, origin }) => {
     const {
-      isVertical:isDirectionVertical,
+      isVertical: isDirectionVertical,
       isNegative: isDirectionNegative,
     } = getDirectionDetails(direction)
 
@@ -116,11 +113,11 @@ function ViewController({
     }
   }
 
-  const getInsertInitiator = id => ({ direction }) => {
+  const getInsertInitiator = (id) => ({ direction }) => {
     const {
       isVertical: isDirectionVertical,
       isNegative: isDirectionNegative,
-      complement: complementDirection
+      complement: complementDirection,
     } = getDirectionDetails(direction)
 
     const activeView = _find(views, { id })
@@ -140,15 +137,15 @@ function ViewController({
       //    guarunteed
       neighbors: {
         ...activeView.neighbors,
-        [complementDirection]: true
-      }
+        [complementDirection]: true,
+      },
     }
 
-    const children = isDirectionNegative ? [ newView, activeView ] : [ activeView, newView ]
+    const children = isDirectionNegative ? [newView, activeView] : [activeView, newView]
 
     const insertedObjects = (isVertical === isDirectionVertical)
       ? children
-      : [ createContainedView(activeView, children) ]
+      : [createContainedView(activeView, children)]
 
     activeView.width = newWidth
     activeView.height = newHeight
@@ -156,12 +153,12 @@ function ViewController({
     setViews([
       ...views.slice(0, viewIndex),
       ...insertedObjects,
-      ...views.slice(viewIndex + 1)
+      ...views.slice(viewIndex + 1),
     ])
   }
 
   // TODO: Make this a callback
-  const getDeleteInitiator = id => ({ direction, preserveViews = [] }) => {
+  const getDeleteInitiator = (id) => ({ direction, preserveViews = [] }) => {
     const {
       isNegative: isDirectionNegative,
     } = getDirectionDetails(direction)
@@ -188,15 +185,15 @@ function ViewController({
     const newViews = [
       ...views.slice(0, viewIndex),
       ...preserveViews,
-      ...views.slice(viewIndex + 1)
+      ...views.slice(viewIndex + 1),
     ]
 
     if (newViews.length <= 1) {
       // There will only be at most one element in this array
-      newViews.forEach(view => {
-        view.width = width
-        view.height = height
-        view.neighbors = neighbors
+      newViews.forEach((view, viewIdx) => {
+        newViews[viewIdx].width = width
+        newViews[viewIdx].height = height
+        newViews[viewIdx].neighbors = neighbors
       })
       requestDeletion({ direction, preserveViews: newViews })
     }
@@ -247,7 +244,7 @@ function ViewController({
         break
 
       default:
-        console.error(`Can't resize in unknown direction: '${direction}'`)
+        throw new Error(`Can't resize in unknown direction: '${direction}'`)
     }
 
     setViews([...views])
@@ -255,8 +252,8 @@ function ViewController({
       ...dragAction,
       origin: {
         x: clientX,
-        y: clientY
-      }
+        y: clientY,
+      },
     })
   }
 
@@ -268,7 +265,7 @@ function ViewController({
     setDragAction(null)
   }
 
-  const childViewContent = views?.map(view => {
+  const childViewContent = views?.map((view) => {
     if (view.children?.length > 0) {
       return (
         <ViewController
@@ -276,8 +273,6 @@ function ViewController({
           layout={view}
           width={view.width}
           height={view.height}
-
-          controllerId={view.id}
           neighbors={view.neighbors}
           isDragged={!!dragAction || isDragged}
           isVertical={!isVertical}
@@ -292,8 +287,6 @@ function ViewController({
         key={view.id}
         width={view.width}
         height={view.height}
-
-        viewId={view.id}
         neighbors={view.neighbors}
         isDragged={!!dragAction || isDragged}
         requestResize={getResizeInitiator(view.id)}
@@ -307,10 +300,10 @@ function ViewController({
     <div
       ref={containerRef}
       className={cx(styles.controller, {
-        [styles.vertical]: isVertical
+        [styles.vertical]: isVertical,
       })}
       style={{
-        width:  `${width * 100}%`,
+        width: `${width * 100}%`,
         height: `${height * 100}%`,
       }}
       onMouseMove={dragAction === null ? null : onMouseMove}
@@ -323,8 +316,9 @@ function ViewController({
 }
 
 ViewController.propTypes = {
-  layout: PropTypes.shape({}).isRequired,
-  controllerId: PropTypes.string.isRequired,
+  layout: PropTypes.shape({
+    children: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  }).isRequired,
   width: PropTypes.number,
   height: PropTypes.number,
   neighbors: PropTypes.shape({}),

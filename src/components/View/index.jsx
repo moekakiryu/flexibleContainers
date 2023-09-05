@@ -10,7 +10,6 @@ import styles from './styles.scss'
 const HOVER_DELAY = 100 // ms
 
 function View({
-  viewId,
   width,
   height,
   neighbors,
@@ -19,42 +18,40 @@ function View({
   requestInsertion,
   requestDeletion,
   component,
-  ...otherProps
 }) {
   const containerRef = useRef()
   const controlHoverTimeout = useRef(null)
 
-  const [ activeControl, setActiveControl ] = useState(null)
+  const [activeControl, setActiveControl] = useState(null)
 
   // TODO: This should not be percentage based (small view = tiny region size)
-  const getControlRegions = (container, mouseX, mouseY, options = { enterRegion: 15, exitRegion: 60 }) => {
+  const getControlRegions = (
+    container,
+    mouseX,
+    mouseY,
+    options = { enterRegion: 15, exitRegion: 60 },
+  ) => {
     const mouseOffset = {
       x: (mouseX - container.offsetLeft),
       y: (mouseY - container.offsetTop),
     }
     const regionSize = activeControl ? options.exitRegion : options.enterRegion
 
-    const activeRegions = {
-      [DIRECTION.left]:   mouseOffset.x < regionSize,
-      [DIRECTION.top]:    mouseOffset.y < regionSize,
-      [DIRECTION.right]:  container.offsetWidth - mouseOffset.x < regionSize,
-      [DIRECTION.bottom]: container.offsetHeight - mouseOffset.y < regionSize,
-    }
-    return activeRegions
+    return [
+      (mouseOffset.x < regionSize) && DIRECTION.left,
+      (mouseOffset.y < regionSize) && DIRECTION.top,
+      (container.offsetWidth - mouseOffset.x < regionSize) && DIRECTION.right,
+      (container.offsetHeight - mouseOffset.y < regionSize) && DIRECTION.bottom,
+    ]
   }
 
   /**
    * @param {*} regions A key/value boolean mapping
    * @returns The name of a true property or undefined
    */
-  const filterControlRegions = regions => {
-    for (const [region, isActive] of Object.entries(regions)) {
-      if (isActive && !!neighbors[region]) {
-        return region
-      }
-    }
-    return null
-  }
+  const filterControlRegions = (regions) => regions.filter(
+    (region) => !!neighbors[region],
+  )[0] || null
 
   const waitForControlHover = (control) => {
     controlHoverTimeout.current = setTimeout(() => {
@@ -71,7 +68,7 @@ function View({
     if (!isDragged && activeControl) {
       requestResize({
         direction: activeControl,
-        origin: { x: mouseX, y: mouseY }
+        origin: { x: mouseX, y: mouseY },
       })
     }
   }, [
@@ -124,7 +121,7 @@ function View({
       ref={containerRef}
       className={styles.view}
       style={{
-        width:  `${width * 100}%`,
+        width: `${width * 100}%`,
         height: `${height * 100}%`,
       }}
       draggable={!activeControl}
@@ -143,7 +140,6 @@ function View({
 }
 
 View.propTypes = {
-  viewId: PropTypes.string.isRequired,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
   neighbors: PropTypes.shape({}),
