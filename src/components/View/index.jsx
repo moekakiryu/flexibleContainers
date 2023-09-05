@@ -45,13 +45,9 @@ function View({
     ]
   }
 
-  /**
-   * @param {*} regions A key/value boolean mapping
-   * @returns The name of a true property or undefined
-   */
-  const filterControlRegions = (regions) => regions.filter(
-    (region) => !!neighbors[region],
-  )[0] || null
+  const filterControlRegions = (regions) => (
+    regions.filter((region) => !!neighbors[region])[0] || null
+  )
 
   const waitForControlHover = (control) => {
     controlHoverTimeout.current = setTimeout(() => {
