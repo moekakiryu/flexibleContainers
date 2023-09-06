@@ -73,15 +73,17 @@ function View({
   ])
 
   const createView = useCallback(() => {
-    setActiveControl(null)
     requestInsertion({ direction: activeControl })
+    setActiveControl(null)
   }, [
+    activeControl,
     requestInsertion,
   ])
 
   const deleteView = useCallback(() => {
     requestDeletion({ direction: activeControl })
   }, [
+    activeControl,
     requestDeletion,
   ])
 
