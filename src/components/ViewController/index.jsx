@@ -26,9 +26,9 @@ const getRandomId = () => `${Math.floor(Math.random() * 1e12)}`
  */
 
 function ViewController({
+  initialLayout,
   width,
   height,
-  initialLayout,
   neighbors,
   isVertical,
   isDragged,
@@ -322,20 +322,20 @@ ViewController.propTypes = {
   width: PropTypes.number,
   height: PropTypes.number,
   neighbors: PropTypes.shape({}),
-  requestResize: PropTypes.func,
-  requestDeletion: PropTypes.func,
   isDragged: PropTypes.bool,
   isVertical: PropTypes.bool,
+  requestResize: PropTypes.func,
+  requestDeletion: PropTypes.func,
 }
 
 ViewController.defaultProps = {
   width: 1,
   height: 1,
   neighbors: {},
-  requestResize: _noop,
-  requestDeletion: _noop,
   isDragged: false,
   isVertical: false,
+  requestResize: _noop,
+  requestDeletion: _noop,
 }
 
 export default ViewController

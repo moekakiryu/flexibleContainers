@@ -14,10 +14,10 @@ function View({
   height,
   neighbors,
   isDragged,
+  component,
   requestResize,
   requestInsertion,
   requestDeletion,
-  component,
 }) {
   const containerRef = useRef()
   const controlHoverTimeout = useRef(null)
@@ -141,19 +141,19 @@ View.propTypes = {
   height: PropTypes.number.isRequired,
   neighbors: PropTypes.shape({}),
   isDragged: PropTypes.bool,
+  component: PropTypes.elementType,
   requestResize: PropTypes.func,
   requestInsertion: PropTypes.func,
   requestDeletion: PropTypes.func,
-  component: PropTypes.elementType,
 }
 
 View.defaultProps = {
   neighbors: [],
   isDragged: false,
+  component: null,
   requestResize: _noop,
   requestInsertion: _noop,
   requestDeletion: _noop,
-  component: null,
 }
 
 export default View
