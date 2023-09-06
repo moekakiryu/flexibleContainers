@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import cx from 'classnames'
 import _noop from 'lodash/noop'
 
-import { DIRECTION } from 'shared/utils'
+import { DIRECTION } from 'shared/utils/directions'
 import { ReactComponent as PlusIcon } from 'static/iconmonstr-plus-lined.svg'
 import { ReactComponent as CrossIcon } from 'static/iconmonstr-x-mark-lined.svg'
 

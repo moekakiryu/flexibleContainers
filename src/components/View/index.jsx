@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import _noop from 'lodash/noop'
 
-import { DIRECTION } from 'shared/utils'
+import { DIRECTION } from 'shared/utils/directions'
 import SizeControl from 'components/SizeControl'
 
 import styles from './styles.scss'

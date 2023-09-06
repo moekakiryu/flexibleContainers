@@ -7,7 +7,7 @@ import cx from 'classnames'
 import _find from 'lodash/find'
 import _noop from 'lodash/noop'
 
-import { DIRECTION, getDirectionDetails } from 'shared/utils'
+import { DIRECTION, getDirectionDetails } from 'shared/utils/directions'
 import View from 'components/View'
 
 import styles from './styles.scss'
@@ -117,7 +117,7 @@ function ViewController({
     const {
       isVertical: isDirectionVertical,
       isNegative: isDirectionNegative,
-      complement: complementDirection,
+      reverse: reverseDirection,
     } = getDirectionDetails(direction)
 
     const activeView = _find(views, { id })
@@ -137,7 +137,7 @@ function ViewController({
       //    guarunteed
       neighbors: {
         ...activeView.neighbors,
-        [complementDirection]: true,
+        [reverseDirection]: true,
       },
     }
 
