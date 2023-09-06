@@ -28,7 +28,7 @@ const getRandomId = () => `${Math.floor(Math.random() * 1e12)}`
 function ViewController({
   width,
   height,
-  layout,
+  initialLayout,
   neighbors,
   isVertical,
   isDragged,
@@ -41,7 +41,7 @@ function ViewController({
   const [dragAction, setDragAction] = useState(null)
 
   useEffect(() => {
-    const { children } = layout
+    const { children } = initialLayout
 
     const totalWidth = children.reduce((total, view) => total + view.width, 0)
     const totalHeight = children.reduce((total, view) => total + view.height, 0)
@@ -75,7 +75,7 @@ function ViewController({
     }))
   }, [
     // Note that all of these props are expected to change very infrequently
-    layout,
+    initialLayout,
     neighbors,
     isVertical,
   ])
@@ -270,7 +270,7 @@ function ViewController({
       return (
         <ViewController
           key={view.id}
-          layout={view}
+          initialLayout={view}
           width={view.width}
           height={view.height}
           neighbors={view.neighbors}
@@ -316,7 +316,7 @@ function ViewController({
 }
 
 ViewController.propTypes = {
-  layout: PropTypes.shape({
+  initialLayout: PropTypes.shape({
     children: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   }).isRequired,
   width: PropTypes.number,

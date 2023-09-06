@@ -108,7 +108,7 @@ function App() {
       </style>
       <ViewController
         controllerId="root"
-        layout={defaultLayout}
+        initialLayout={defaultLayout}
       />
     </>
   )
