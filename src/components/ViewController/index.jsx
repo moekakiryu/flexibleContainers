@@ -120,12 +120,12 @@ function ViewController({
       reverse: reverseDirection,
     } = getDirectionDetails(direction)
 
-    const activeView = _find(views, { id })
-    const viewIndex = views.indexOf(activeView)
+    const targetView = _find(views, { id })
+    const targetIndex = views.indexOf(targetView)
 
     // The new view should take up half of the old views space
-    const newWidth = isDirectionVertical ? 1 : activeView.width / 2
-    const newHeight = isDirectionVertical ? activeView.height / 2 : 1
+    const newWidth = isDirectionVertical ? 1 : targetView.width / 2
+    const newHeight = isDirectionVertical ? targetView.height / 2 : 1
 
     const newView = {
       id: getRandomId(),
@@ -136,24 +136,24 @@ function ViewController({
       //    pushing the active view up, meaning the opposite neighbor is
       //    guarunteed
       neighbors: {
-        ...activeView.neighbors,
+        ...targetView.neighbors,
         [reverseDirection]: true,
       },
     }
 
-    const children = isDirectionNegative ? [newView, activeView] : [activeView, newView]
+    const children = isDirectionNegative ? [newView, targetView] : [targetView, newView]
 
     const insertedObjects = (isVertical === isDirectionVertical)
       ? children
-      : [createContainedView(activeView, children)]
+      : [createContainedView(targetView, children)]
 
-    activeView.width = newWidth
-    activeView.height = newHeight
+    targetView.width = newWidth
+    targetView.height = newHeight
 
     setViews([
-      ...views.slice(0, viewIndex),
+      ...views.slice(0, targetIndex),
       ...insertedObjects,
-      ...views.slice(viewIndex + 1),
+      ...views.slice(targetIndex + 1),
     ])
   }
 
@@ -163,29 +163,29 @@ function ViewController({
       isNegative: isDirectionNegative,
     } = getDirectionDetails(direction)
 
-    const activeView = _find(views, { id })
-    const viewIndex = views.indexOf(activeView)
+    const targetView = _find(views, { id })
+    const targetIndex = views.indexOf(targetView)
 
-    const prevView = views[viewIndex - 1]
-    const nextView = views[viewIndex + 1]
+    const prevView = views[targetIndex - 1]
+    const nextView = views[targetIndex + 1]
 
     // The adjacent view (if any) should expand to fill the empty space left by
     // the deleted view
     if (preserveViews.length === 0) {
-      // Fallbacks are in case activeView is the first or last child
+      // Fallbacks are in case targetView is the first or last child
       const resizedView = isDirectionNegative ? (prevView || nextView) : (nextView || prevView)
 
       if (isVertical) {
-        resizedView.height += activeView.height
+        resizedView.height += targetView.height
       } else {
-        resizedView.width += activeView.width
+        resizedView.width += targetView.width
       }
     }
 
     const newViews = [
-      ...views.slice(0, viewIndex),
+      ...views.slice(0, targetIndex),
       ...preserveViews,
-      ...views.slice(viewIndex + 1),
+      ...views.slice(targetIndex + 1),
     ]
 
     if (newViews.length <= 1 && !newViews[0]?.children?.length) {
@@ -210,35 +210,35 @@ function ViewController({
       y: (clientY - origin.y) / containerRef.current.offsetHeight,
     }
 
-    const activeView = _find(views, { id })
-    const prevView = views[views.indexOf(activeView) - 1]
-    const nextView = views[views.indexOf(activeView) + 1]
+    const targetView = _find(views, { id })
+    const prevView = views[views.indexOf(targetView) - 1]
+    const nextView = views[views.indexOf(targetView) + 1]
 
     switch (direction) {
       case DIRECTION.left:
         if (prevView) {
-          activeView.width -= sizeDelta.x
+          targetView.width -= sizeDelta.x
           prevView.width += sizeDelta.x
         }
         break
 
       case DIRECTION.right:
         if (nextView) {
-          activeView.width += sizeDelta.x
+          targetView.width += sizeDelta.x
           nextView.width -= sizeDelta.x
         }
         break
 
       case DIRECTION.top:
         if (prevView) {
-          activeView.height -= sizeDelta.y
+          targetView.height -= sizeDelta.y
           prevView.height += sizeDelta.y
         }
         break
 
       case DIRECTION.bottom:
         if (nextView) {
-          activeView.height += sizeDelta.y
+          targetView.height += sizeDelta.y
           nextView.height -= sizeDelta.y
         }
         break
