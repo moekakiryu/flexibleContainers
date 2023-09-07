@@ -123,7 +123,6 @@ function ViewController({
     const {
       isVertical: isDirectionVertical,
       isNegative: isDirectionNegative,
-      reverse: reverseDirection,
     } = getDirectionDetails(direction)
 
     const targetView = _find(views, { id })
@@ -140,11 +139,11 @@ function ViewController({
       // The new view will displace the active view
       // eg direction = down --> new view will be in bottom half of old space,
       //    pushing the active view up, meaning the opposite neighbor is
-      //    guarunteed
-      neighbors: {
-        ...targetView.neighbors,
-        [reverseDirection]: true,
-      },
+      //    guaranteed
+      neighbors: getViewNeighbors(
+        isDirectionNegative ? true : targetView.neighbors[direction],
+        isDirectionNegative ? targetView.neighbors[direction] : true,
+      ),
     }
 
     const children = isDirectionNegative ? [newView, targetView] : [targetView, newView]
