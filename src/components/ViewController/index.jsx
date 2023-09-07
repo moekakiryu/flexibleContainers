@@ -20,8 +20,8 @@ const getRandomId = () => `${Math.floor(Math.random() * 1e12)}`
  *   id: str,
  *   width: number,
  *   height: number,
+ *   neighbors: bool{0,4},
  *   children: View[],
- *   neighbors: View{0,4},
  * }
  */
 
@@ -40,6 +40,28 @@ function ViewController({
   const [views, setViews] = useState()
   const [dragAction, setDragAction] = useState(null)
 
+  const getViewNeighbors = (hasPrev, hasNext) => {
+    const viewNeighbors = isVertical ? {
+      ...neighbors,
+      [DIRECTION.top]: hasPrev || neighbors[DIRECTION.top],
+      [DIRECTION.bottom]: hasNext || neighbors[DIRECTION.bottom],
+    } : {
+      ...neighbors,
+      [DIRECTION.left]: hasPrev || neighbors[DIRECTION.left],
+      [DIRECTION.right]: hasNext || neighbors[DIRECTION.right],
+    }
+
+    return viewNeighbors
+  }
+
+  const createContainedView = (replaceView, children = []) => ({
+    id: getRandomId(),
+    width: replaceView.width,
+    height: replaceView.height,
+    neighbors: { ...replaceView.neighbors },
+    children,
+  })
+
   useEffect(() => {
     const { children } = initialLayout
 
@@ -52,15 +74,7 @@ function ViewController({
       const hasNext = !!children[childIdx + 1]
 
       // Calculate adjacent elements to assist with rendering size controls
-      const childNeighbors = isVertical ? {
-        ...neighbors,
-        [DIRECTION.top]: hasPrev || neighbors[DIRECTION.top],
-        [DIRECTION.bottom]: hasNext || neighbors[DIRECTION.bottom],
-      } : {
-        ...neighbors,
-        [DIRECTION.left]: hasPrev || neighbors[DIRECTION.left],
-        [DIRECTION.right]: hasNext || neighbors[DIRECTION.right],
-      }
+      const childNeighbors = getViewNeighbors(hasPrev, hasNext)
 
       // Normalize view dimensions (if they sum to a value other than 1)
       const viewWidth = !isVertical ? (child.width / totalWidth) : child.width
@@ -79,14 +93,6 @@ function ViewController({
     neighbors,
     isVertical,
   ])
-
-  const createContainedView = (replaceView, children = []) => ({
-    id: getRandomId(),
-    width: replaceView.width,
-    height: replaceView.height,
-    neighbors: { ...replaceView.neighbors },
-    children,
-  })
 
   // TODO: Optimize these callbacks using a method like: https://medium.com/@0utoftime/using-reacts-usecallback-hook-to-preserve-identity-of-partially-applied-callbacks-in-collections-3dbac35371ea
   const getResizeInitiator = (id) => ({ direction, origin }) => {
@@ -166,15 +172,26 @@ function ViewController({
     const targetView = _find(views, { id })
     const targetIndex = views.indexOf(targetView)
 
+    const newViews = [
+      ...views.slice(0, targetIndex),
+      ...preserveViews,
+      ...views.slice(targetIndex + 1),
+    ]
+
     const prevView = views[targetIndex - 1]
     const nextView = views[targetIndex + 1]
+
+    const resizedView = isDirectionNegative ? (prevView || nextView) : (nextView || prevView)
+    const resizedIndex = newViews.indexOf(resizedView)
 
     // The adjacent view (if any) should expand to fill the empty space left by
     // the deleted view
     if (preserveViews.length === 0) {
+      resizedView.neighbors = getViewNeighbors(
+        !!newViews[resizedIndex - 1],
+        !!newViews[resizedIndex + 1],
+      )
       // Fallbacks are in case targetView is the first or last child
-      const resizedView = isDirectionNegative ? (prevView || nextView) : (nextView || prevView)
-
       if (isVertical) {
         resizedView.height += targetView.height
       } else {
@@ -182,18 +199,14 @@ function ViewController({
       }
     }
 
-    const newViews = [
-      ...views.slice(0, targetIndex),
-      ...preserveViews,
-      ...views.slice(targetIndex + 1),
-    ]
+    // If it is a container, it will have a populated 'children' array
+    const isNestedContainer = !!newViews[0]?.children?.length
 
-    if (newViews.length <= 1 && !newViews[0]?.children?.length) {
+    if (newViews.length <= 1 && !isNestedContainer) {
       // There will only be at most one element in this array
       newViews.forEach((view, viewIdx) => {
         newViews[viewIdx].width = width
         newViews[viewIdx].height = height
-        newViews[viewIdx].neighbors = neighbors
       })
       requestDeletion({ direction, preserveViews: newViews })
     }
