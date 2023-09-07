@@ -184,14 +184,16 @@ function ViewController({
     const resizedView = isDirectionNegative ? (prevView || nextView) : (nextView || prevView)
     const resizedIndex = newViews.indexOf(resizedView)
 
-    // The adjacent view (if any) should expand to fill the empty space left by
-    // the deleted view
+    // If it is a container, it will have a populated 'children' array
+    const isNestedContainer = !!newViews[0]?.children?.length
+
+    // If and only if this is the first deletion in the chain
     if (preserveViews.length === 0) {
       resizedView.neighbors = getViewNeighbors(
         !!newViews[resizedIndex - 1],
         !!newViews[resizedIndex + 1],
       )
-      // Fallbacks are in case targetView is the first or last child
+
       if (isVertical) {
         resizedView.height += targetView.height
       } else {
@@ -199,16 +201,12 @@ function ViewController({
       }
     }
 
-    // If it is a container, it will have a populated 'children' array
-    const isNestedContainer = !!newViews[0]?.children?.length
-
     if (newViews.length <= 1 && !isNestedContainer) {
       // There will only be at most one element in this array
-      newViews.forEach((view, viewIdx) => {
-        newViews[viewIdx].width = width
-        newViews[viewIdx].height = height
-      })
-      requestDeletion({ direction, preserveViews: newViews })
+      resizedView.width = width
+      resizedView.height = height
+
+      requestDeletion({ direction, preserveViews: [resizedView] })
     }
 
     setViews(newViews)
